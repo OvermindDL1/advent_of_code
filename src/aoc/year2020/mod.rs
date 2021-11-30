@@ -4,6 +4,7 @@ use clap::Parser;
 
 #[derive(Debug, Parser)]
 pub enum Year2020 {
+	/// Advent of Code 2020, Day 1
 	#[clap(name = "1")]
 	Day1(day1::Day1),
 }

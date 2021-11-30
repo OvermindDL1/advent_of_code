@@ -10,36 +10,43 @@ use clap::Parser;
 
 #[derive(Debug, Parser)]
 pub enum AocYear {
+	/// Advent of Code 2015
 	#[clap(name = "2015")]
 	Year2015 {
 		#[clap(subcommand)]
 		year: year2015::Year2015,
 	},
+	/// Advent of Code 2016
 	#[clap(name = "2016")]
 	Year2016 {
 		#[clap(subcommand)]
 		year: year2016::Year2016,
 	},
+	/// Advent of Code 2017
 	#[clap(name = "2017")]
 	Year2017 {
 		#[clap(subcommand)]
 		year: year2017::Year2017,
 	},
+	/// Advent of Code 2018
 	#[clap(name = "2018")]
 	Year2018 {
 		#[clap(subcommand)]
 		year: year2018::Year2018,
 	},
+	/// Advent of Code 2019
 	#[clap(name = "2019")]
 	Year2019 {
 		#[clap(subcommand)]
 		year: year2019::Year2019,
 	},
+	/// Advent of Code 2020
 	#[clap(name = "2020")]
 	Year2020 {
 		#[clap(subcommand)]
 		year: year2020::Year2020,
 	},
+	/// Advent of Code 2021
 	#[clap(name = "2021")]
 	Year2021 {
 		#[clap(subcommand)]

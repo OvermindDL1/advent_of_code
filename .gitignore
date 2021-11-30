@@ -29,3 +29,6 @@
 !/src/**/*.rs
 !/test/**/*.rs
 !/benches/**/*.rs
+
+# Project specific files and assets
+!/inputs/**/*
