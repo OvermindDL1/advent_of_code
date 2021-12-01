@@ -1,8 +1,6 @@
-use anyhow::Context as _;
+use crate::aoc::helpers::*;
 use clap::Parser;
 use itertools::Itertools;
-use std::fs::File;
-use std::io::{BufRead, BufReader};
 use std::path::PathBuf;
 
 #[derive(Debug, Parser)]
@@ -13,25 +11,11 @@ pub struct Day1 {
 
 impl Day1 {
 	pub fn run(&self) -> anyhow::Result<()> {
-		let mut nums = Vec::with_capacity(8192);
-		{
-			let mut line = String::with_capacity(16);
-			let mut data = BufReader::new(File::open(&self.input_file)?);
-			while let Ok(len) = data.read_line(&mut line) {
-				if len == 0 {
-					break;
-				}
-				let trimmed = line.trim();
-				if !trimmed.is_empty() {
-					nums.push(
-						trimmed
-							.parse::<usize>()
-							.with_context(|| format!("Invalid line: {:?}", line))?,
-					);
-				}
-				line.clear();
-			}
-		}
+		let nums =
+			map_trimmed_nonempty_lines_of_file(
+				&self.input_file,
+				|line| Ok(line.parse::<usize>()?),
+			)?;
 		println!(
 			"Step 1: {}",
 			nums.iter()
