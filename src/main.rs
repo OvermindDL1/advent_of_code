@@ -3,6 +3,8 @@ use clap::Parser;
 
 fn main() -> anyhow::Result<()> {
 	let args = AocApp::parse();
-	println!("{:?}", args);
+	if args.verbose > 1 {
+		println!("{:?}", args);
+	}
 	args.run()
 }

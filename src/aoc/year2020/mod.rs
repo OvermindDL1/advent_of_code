@@ -1,6 +1,7 @@
 pub mod day1;
 pub mod day2;
 
+use crate::AocApp;
 use clap::Parser;
 
 #[derive(Debug, Parser)]
@@ -14,7 +15,11 @@ pub enum Year2020 {
 }
 
 impl Year2020 {
-	pub fn run(&self) -> anyhow::Result<()> {
-		crate::run_days!(self, [Day1, Day2])
+	pub fn run(&self, app: &AocApp) -> anyhow::Result<()> {
+		crate::run_days!(self, app, [Day1, Day2])
+	}
+
+	pub fn run_all(app: &AocApp) -> anyhow::Result<()> {
+		crate::run_all_days!(Year2020, app, [Day1, Day2])
 	}
 }

@@ -1,4 +1,5 @@
 use crate::aoc::helpers::*;
+use crate::AocApp;
 use clap::Parser;
 use itertools::Itertools;
 use std::path::PathBuf;
@@ -11,7 +12,7 @@ pub struct Day1 {
 }
 
 impl Day1 {
-	pub fn run(&self) -> anyhow::Result<()> {
+	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
 		let nums =
 			map_trimmed_nonempty_lines_of_file(
 				&self.input_file,

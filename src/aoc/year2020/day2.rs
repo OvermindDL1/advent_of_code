@@ -1,4 +1,5 @@
 use crate::aoc::helpers::*;
+use crate::AocApp;
 use anyhow::Context as _;
 use clap::Parser;
 use std::path::PathBuf;
@@ -11,7 +12,7 @@ pub struct Day2 {
 }
 
 impl Day2 {
-	pub fn run(&self) -> anyhow::Result<()> {
+	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
 		let mut valid_count_1 = 0;
 		let mut valid_count_2 = 0;
 		process_trimmed_nonempty_lines_of_file(&self.input_file, |line| {

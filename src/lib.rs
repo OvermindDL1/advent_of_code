@@ -9,7 +9,7 @@ use clap::Parser;
 pub struct AocApp {
 	/// Level of verbosity, can be used multiple times for more verbosity
 	#[clap(short, long, parse(from_occurrences))]
-	verbose: u8,
+	pub verbose: u8,
 	/// The command to execute
 	#[clap(subcommand)]
 	command: AocAppCommand,
@@ -20,9 +20,17 @@ impl AocApp {
 		match &self.command {
 			AocAppCommand::Run(aoc) => {
 				let start = Instant::now();
-				let res = aoc.run();
+				let res = aoc.run(self);
 				if self.verbose >= 1 {
 					println!("Time Taken: {:?}", start.elapsed());
+				}
+				res
+			}
+			AocAppCommand::RunAll => {
+				let start = Instant::now();
+				let res = aoc::AocYear::run_all(&self);
+				if self.verbose >= 1 {
+					println!("All Time Taken: {:?}", start.elapsed());
 				}
 				res
 			}
@@ -37,5 +45,6 @@ impl AocApp {
 pub enum AocAppCommand {
 	#[clap(flatten)]
 	Run(aoc::AocYear),
+	RunAll,
 	TUI,
 }

@@ -7,6 +7,7 @@ pub mod year2019;
 pub mod year2020;
 pub mod year2021;
 
+use crate::AocApp;
 use clap::Parser;
 
 #[derive(Debug, Parser)]
@@ -56,24 +57,61 @@ pub enum AocYear {
 }
 
 impl AocYear {
-	pub fn run(&self) -> anyhow::Result<()> {
+	pub fn run(&self, app: &AocApp) -> anyhow::Result<()> {
 		match self {
-			AocYear::Year2015 { day } => day.run(),
-			AocYear::Year2016 { day } => day.run(),
-			AocYear::Year2017 { day } => day.run(),
-			AocYear::Year2018 { day } => day.run(),
-			AocYear::Year2019 { day } => day.run(),
-			AocYear::Year2020 { day } => day.run(),
-			AocYear::Year2021 { day } => day.run(),
+			AocYear::Year2015 { day } => day.run(app),
+			AocYear::Year2016 { day } => day.run(app),
+			AocYear::Year2017 { day } => day.run(app),
+			AocYear::Year2018 { day } => day.run(app),
+			AocYear::Year2019 { day } => day.run(app),
+			AocYear::Year2020 { day } => day.run(app),
+			AocYear::Year2021 { day } => day.run(app),
 		}
+	}
+
+	pub fn run_all(app: &AocApp) -> anyhow::Result<()> {
+		year2015::Year2015::run_all(app)?;
+		year2016::Year2016::run_all(app)?;
+		year2017::Year2017::run_all(app)?;
+		year2018::Year2018::run_all(app)?;
+		year2019::Year2019::run_all(app)?;
+		year2020::Year2020::run_all(app)?;
+		year2021::Year2021::run_all(app)?;
+		Ok(())
 	}
 }
 
 #[macro_export]
 macro_rules! run_days {
-	($self:ident, [$($day:ident),* $(,)*]) => {
+	($self:ident, $app:ident, [$($day:ident),* $(,)*]) => {
 		match $self {
-			$(Self::$day(day) => day.run(),)*
+			$(Self::$day(day) => {
+				let start = std::time::Instant::now();
+				let res = day.run($app);
+				if $app.verbose >= 1 {
+					println!("_{} Time Taken: {:?}_", stringify!($day), start.elapsed());
+				}
+				res
+			})*
 		}
 	}
+}
+
+#[macro_export]
+macro_rules! run_all_days {
+	($self:ident, $app:ident, [$($day:ident),* $(,)*]) => {{
+		{
+			let _ = $app;
+		}
+		println!("## {}", stringify!($self));
+		let year_start = std::time::Instant::now();
+		$({
+			println!("### {}", stringify!($day));
+			$self::$day(clap::Parser::parse_from(&[] as &[&str])).run($app)?;
+		})*
+		if $app.verbose >= 1 {
+			println!("_{} Time Taken: {:?}_", stringify!($self), year_start.elapsed());
+		}
+		Ok(())
+	}}
 }
