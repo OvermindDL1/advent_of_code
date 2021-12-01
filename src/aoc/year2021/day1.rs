@@ -6,6 +6,7 @@ use std::path::PathBuf;
 #[derive(Debug, Parser)]
 pub struct Day1 {
 	/// The input file of "depths"
+	#[clap(default_value = "inputs/2021/day1.input")]
 	pub input_file: PathBuf,
 }
 

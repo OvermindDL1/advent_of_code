@@ -1,12 +1,12 @@
+use crate::aoc::helpers::*;
 use anyhow::Context as _;
 use clap::Parser;
-use std::fs::File;
-use std::io::{BufRead, BufReader};
 use std::path::PathBuf;
 
 #[derive(Debug, Parser)]
 pub struct Day2 {
 	/// The input file to use with the parseable type per line
+	#[clap(default_value = "inputs/2020/day2.input")]
 	pub input_file: PathBuf,
 }
 
@@ -14,32 +14,21 @@ impl Day2 {
 	pub fn run(&self) -> anyhow::Result<()> {
 		let mut valid_count_1 = 0;
 		let mut valid_count_2 = 0;
-		{
-			let mut line = String::with_capacity(16);
-			let mut data = BufReader::new(File::open(&self.input_file)?);
-			while let Ok(len) = data.read_line(&mut line) {
-				if len == 0 {
-					break;
+		process_trimmed_nonempty_lines_of_file(&self.input_file, |line| {
+			match Self::is_valid(line)? {
+				(true, true) => {
+					valid_count_1 += 1;
+					valid_count_2 += 1;
 				}
-				let trimmed = line.trim();
-				if !trimmed.is_empty() {
-					match Self::is_valid(trimmed)
-						.with_context(|| format!("failed while processing: {}", trimmed))?
-					{
-						(true, true) => {
-							valid_count_1 += 1;
-							valid_count_2 += 1;
-						}
-						(true, false) => valid_count_1 += 1,
-						(false, true) => valid_count_2 += 1,
-						(false, false) => (),
-					}
-				}
-				line.clear();
+				(true, false) => valid_count_1 += 1,
+				(false, true) => valid_count_2 += 1,
+				(false, false) => (),
 			}
-			println!("Step 1: {}", valid_count_1);
-			println!("Step 2: {}", valid_count_2);
-		}
+			Ok(())
+		})?;
+
+		println!("Step 1: {}", valid_count_1);
+		println!("Step 2: {}", valid_count_2);
 
 		Ok(())
 	}

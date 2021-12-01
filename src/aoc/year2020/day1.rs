@@ -1,34 +1,23 @@
+use crate::aoc::helpers::*;
 use clap::Parser;
-// use itertools::Itertools;
 use std::cmp::Ordering;
-use std::fs::File;
-use std::io::{BufRead, BufReader};
 use std::path::PathBuf;
 
 #[derive(Debug, Parser)]
 pub struct Day1 {
 	/// The input file to use full of integers one per line
+	#[clap(default_value = "inputs/2020/day1.input")]
 	pub input_file: PathBuf,
 }
 
 impl Day1 {
 	pub fn run(&self) -> anyhow::Result<()> {
-		let mut nums = Vec::with_capacity(1024);
-		{
-			let mut line = String::with_capacity(16);
-			let mut data = BufReader::new(File::open(&self.input_file)?);
-			while let Ok(len) = data.read_line(&mut line) {
-				if len == 0 {
-					break;
-				}
-				let trimmed = line.trim();
-				if !trimmed.is_empty() {
-					nums.push(trimmed.parse::<u32>()?);
-				}
-				line.clear();
-			}
-		}
-		nums.sort();
+		let mut nums =
+			map_trimmed_nonempty_lines_of_file(
+				&self.input_file,
+				|line| Ok(line.parse::<usize>()?),
+			)?;
+		nums.sort_unstable();
 
 		for a in 0..nums.len() {
 			for b in a + 1..nums.len() {
