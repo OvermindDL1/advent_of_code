@@ -1,5 +1,6 @@
 use crate::aoc::helpers::*;
 use clap::Parser;
+// use itertools::Itertools;
 use std::cmp::Ordering;
 use std::path::PathBuf;
 
@@ -36,6 +37,9 @@ impl Day1 {
 
 		for a in 0..nums.len() {
 			for b in a + 1..nums.len() {
+				if a + b > 2020 {
+					break;
+				}
 				for c in b + 1..nums.len() {
 					match (nums[a] + nums[b] + nums[c]).cmp(&2020) {
 						Ordering::Less => {}
@@ -51,6 +55,7 @@ impl Day1 {
 			}
 		}
 
+		// Basic but simple solution that doesn't early exit, the above early exits so it's MUCH faster.
 		// nums.iter()
 		// 	.tuple_combinations()
 		// 	.filter(|(&a, &b)| a + b == 2020)
