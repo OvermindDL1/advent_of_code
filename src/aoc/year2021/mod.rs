@@ -10,6 +10,6 @@ pub enum Year2021 {
 
 impl Year2021 {
 	pub fn run(&self) -> anyhow::Result<()> {
-		todo!()
+		todo!("preparing for Advent of Code 2020 year 2021!")
 	}
 }

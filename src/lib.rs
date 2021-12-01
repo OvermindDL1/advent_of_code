@@ -27,7 +27,7 @@ impl AocApp {
 				res
 			}
 			AocAppCommand::TUI => {
-				todo!()
+				todo!("still need to make the TUI")
 			}
 		}
 	}

@@ -70,3 +70,25 @@ as the first argument, such as with:
 
 Feel free to add more `v`'s such as `-vvv` for more detailed logging,
 but just one will print the times for the runs.
+
+## Hints
+
+### Heredoc
+
+If you want test the example of your problem then you can send it
+in via a heredoc if using a good modern shell, such as via:
+
+```zsh
+cargo run --release -- 2020 1 <(cat <<EOI
+1721
+979
+366
+299
+675
+1456
+EOI
+)
+```
+
+Everything within the `<()` is passed as a fake file/pipe via the
+shell to the program.
