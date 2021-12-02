@@ -85,6 +85,7 @@ impl AocYear {
 macro_rules! run_days {
 	($year:ident, $self:ident, $app:ident, [$($day:ident),* $(,)*]) => {
 		match $self {
+			$year::RunAll => $year::run_all($app),
 			$(Self::$day(day) => {
 				println!("### {} - {}", stringify!($year), stringify!($day));
 				let start = std::time::Instant::now();
