@@ -4,6 +4,7 @@ pub mod day3;
 pub mod day4;
 pub mod day5;
 pub mod day6;
+pub mod day7;
 
 use crate::AocApp;
 use clap::Parser;
@@ -30,14 +31,22 @@ pub enum Year2020 {
 	/// Advent of Code 2020, Day 6 - Custom Customs
 	#[clap(name = "6")]
 	Day6(day6::Day6),
+	/// Advent of Code 2020, Day 7 - Handy Haversacks
+	#[clap(name = "7")]
+	Day7(day7::Day7),
 }
 
 impl Year2020 {
 	pub fn run(&self, app: &AocApp) -> anyhow::Result<()> {
-		crate::run_days!(Year2020, self, app, [Day1, Day2, Day3, Day4, Day5, Day6])
+		crate::run_days!(
+			Year2020,
+			self,
+			app,
+			[Day1, Day2, Day3, Day4, Day5, Day6, Day7]
+		)
 	}
 
 	pub fn run_all(app: &AocApp) -> anyhow::Result<()> {
-		crate::run_all_days!(Year2020, app, [Day1, Day2, Day3, Day4, Day5, Day6])
+		crate::run_all_days!(Year2020, app, [Day1, Day2, Day3, Day4, Day5, Day6, Day7])
 	}
 }
