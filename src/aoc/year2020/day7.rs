@@ -9,7 +9,7 @@ use std::path::PathBuf;
 
 #[derive(Debug, Parser)]
 pub struct Day7 {
-	/// The input file to use with the parseable data blank line delimited
+	/// The input file to use with the parseable rules
 	#[clap(default_value = "inputs/2020/day7.input")]
 	pub input_file: PathBuf,
 }
