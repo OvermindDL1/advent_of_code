@@ -10,7 +10,7 @@ pub fn process_lines_of_file(
 	let mut line = String::with_capacity(16);
 	let mut data = BufReader::new(File::open(filepath)?);
 	while data.read_line(&mut line)? > 0 {
-		cb(&line)?;
+		cb(&line).with_context(|| format!("Failed parsing line: {}", line))?;
 		let trimmed = line.trim();
 		if !trimmed.is_empty() {}
 		line.clear();
@@ -46,7 +46,7 @@ pub fn map_trimmed_nonempty_lines_of_file<R, F: FnMut(&str) -> anyhow::Result<R>
 ) -> anyhow::Result<Vec<R>> {
 	let mut results = Vec::with_capacity(8192);
 	process_trimmed_nonempty_lines_of_file(filepath, |line| {
-		results.push(cb(line).with_context(|| format!("Failed parsing line: {}", line))?);
+		results.push(cb(line)?);
 		Ok(())
 	})?;
 	Ok(results)

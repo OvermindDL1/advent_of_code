@@ -22,7 +22,7 @@ impl AocApp {
 				let start = Instant::now();
 				let res = aoc.run(self);
 				if self.verbose >= 1 {
-					println!("Time Taken: {:?}", start.elapsed());
+					println!("_Time Taken: {:?}_", start.elapsed());
 				}
 				res
 			}
@@ -30,7 +30,7 @@ impl AocApp {
 				let start = Instant::now();
 				let res = aoc::AocYear::run_all(&self);
 				if self.verbose >= 1 {
-					println!("All Time Taken: {:?}", start.elapsed());
+					println!("_All Time Taken: {:?}_", start.elapsed());
 				}
 				res
 			}
