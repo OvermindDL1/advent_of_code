@@ -27,6 +27,7 @@ impl AocApp {
 				res
 			}
 			AocAppCommand::RunAll => {
+				println!("# OvermindDL1's Advent Of Code");
 				let start = Instant::now();
 				let res = aoc::AocYear::run_all(&self);
 				if self.verbose >= 1 {

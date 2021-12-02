@@ -16,7 +16,7 @@ pub enum Year2021 {
 
 impl Year2021 {
 	pub fn run(&self, app: &AocApp) -> anyhow::Result<()> {
-		crate::run_days!(self, app, [Day1, Day2])
+		crate::run_days!(Year2021, self, app, [Day1, Day2])
 	}
 
 	pub fn run_all(app: &AocApp) -> anyhow::Result<()> {

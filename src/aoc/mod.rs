@@ -83,9 +83,10 @@ impl AocYear {
 
 #[macro_export]
 macro_rules! run_days {
-	($self:ident, $app:ident, [$($day:ident),* $(,)*]) => {
+	($year:ident, $self:ident, $app:ident, [$($day:ident),* $(,)*]) => {
 		match $self {
 			$(Self::$day(day) => {
+				println!("### {} - {}", stringify!($year), stringify!($day));
 				let start = std::time::Instant::now();
 				let res = day.run($app);
 				if $app.verbose >= 1 {
@@ -106,7 +107,6 @@ macro_rules! run_all_days {
 		println!("## {}", stringify!($self));
 		let year_start = std::time::Instant::now();
 		$({
-			println!("### {}", stringify!($day));
 			$self::$day(clap::Parser::parse_from(&[] as &[&str])).run($app)?;
 		})*
 		if $app.verbose >= 1 {
