@@ -8,7 +8,7 @@ use std::str::FromStr;
 
 #[derive(Debug, Parser)]
 pub struct Day5 {
-	/// The input file to use with the parseable data blank line delimited
+	/// The input file to use with the parseable seat data
 	#[clap(default_value = "inputs/2020/day5.input")]
 	pub input_file: PathBuf,
 }
