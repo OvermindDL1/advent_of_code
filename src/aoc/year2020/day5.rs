@@ -45,16 +45,10 @@ impl FromStr for Seat {
 
 impl Day5 {
 	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
-		let mut highest = Seat(0);
-		let mut seats = map_trimmed_nonempty_lines_of_file(&self.input_file, |line| {
-			let seat = line.parse::<Seat>()?;
-			if seat.0 > highest.0 {
-				highest = seat;
-			}
-			Ok(seat)
-		})?;
+		let mut seats =
+			map_trimmed_nonempty_lines_of_file(&self.input_file, |line| Ok(line.parse::<Seat>()?))?;
 		seats.sort_unstable();
-		println!("Step 1: {}", highest.0);
+		println!("Step 1: {}", seats.last().context("no seats")?.0);
 		println!(
 			"Step 2: {}",
 			seats
