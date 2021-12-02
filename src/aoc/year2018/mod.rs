@@ -3,7 +3,7 @@ use clap::Parser;
 
 #[derive(Debug, Parser)]
 pub enum Year2018 {
-	/// Run all the Advent of Code 201 days
+	/// Run all the Advent of Code 2018 days
 	RunAll,
 }
 
