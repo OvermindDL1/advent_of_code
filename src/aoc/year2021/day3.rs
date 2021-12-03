@@ -21,15 +21,15 @@ impl Day3 {
 		let mut width = 0;
 		let mut nums = map_trimmed_nonempty_lines_of_file(&self.input_file, |line| {
 			width = line.as_bytes().len();
-			Ok(u16::from_str_radix(line, 2)?)
+			Ok(u32::from_str_radix(line, 2)?)
 		})?;
 
-		let width: u16 = width.try_into()?;
+		let width: u32 = width.try_into()?;
 		let half_count = nums.len() as u32 / 2;
 		let gamma = nums
 			.iter()
 			.copied()
-			.fold([0u32; u16::BITS as usize], |mut arr, n| {
+			.fold([0u32; u32::BITS as usize], |mut arr, n| {
 				(0..width).for_each(|i| arr[i as usize] += ((n & (1 << i)) != 0) as u32);
 				arr
 			})
@@ -55,14 +55,14 @@ impl Day3 {
 				oxygens = new_most;
 			}
 		}
-		let co2_rating = *co2s.first().context("failed finding co2 value")? as u32;
-		let oxygen_rating = *oxygens.first().context("failed finding oxygen value")? as u32;
+		let co2_rating = *co2s.first().context("failed finding co2 value")?;
+		let oxygen_rating = *oxygens.first().context("failed finding oxygen value")?;
 		println!("Step 2: {}", oxygen_rating * co2_rating);
 
 		Ok(())
 	}
 
-	fn sort_bits_into_slices(nums: &mut [u16], idx: usize) -> (&mut [u16], &mut [u16]) {
+	fn sort_bits_into_slices(nums: &mut [u32], idx: usize) -> (&mut [u32], &mut [u32]) {
 		let ones_count = nums
 			.iter()
 			.copied()
