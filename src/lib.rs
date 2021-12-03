@@ -19,11 +19,11 @@ impl AocApp {
 	pub fn run(&self) -> anyhow::Result<()> {
 		match &self.command {
 			AocAppCommand::Run(aoc) => {
-				let start = Instant::now();
+				// let start = Instant::now();
 				let res = aoc.run(self);
-				if self.verbose >= 1 {
-					println!("_Time Taken: {:?}_", start.elapsed());
-				}
+				// if self.verbose >= 1 {
+				// 	println!("_Total Program Time Taken: {:?}_", start.elapsed());
+				// }
 				res
 			}
 			AocAppCommand::RunAll => {

@@ -11,8 +11,6 @@ pub fn process_lines_of_file(
 	let mut data = BufReader::new(File::open(filepath)?);
 	while data.read_line(&mut line)? > 0 {
 		cb(&line).with_context(|| format!("Failed parsing line: {}", line))?;
-		let trimmed = line.trim();
-		if !trimmed.is_empty() {}
 		line.clear();
 	}
 	Ok(())
