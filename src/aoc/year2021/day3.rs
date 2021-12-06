@@ -11,9 +11,6 @@ pub struct Day3 {
 	/// The input file of "diagnostic bits"
 	#[clap(default_value = "inputs/2021/day3.input")]
 	pub input_file: PathBuf,
-	/// The bitcount per line cache size
-	#[clap(long, short, default_value = "12")]
-	pub bitcount_cache_size: usize,
 }
 
 impl Day3 {
