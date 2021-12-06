@@ -8,7 +8,7 @@ use std::str::FromStr;
 
 #[derive(Debug, Parser)]
 pub struct Day5 {
-	/// The input file of bingo calls and cards
+	/// The input file of lines as coordinates
 	#[clap(default_value = "inputs/2021/day5.input")]
 	pub input_file: PathBuf,
 }
