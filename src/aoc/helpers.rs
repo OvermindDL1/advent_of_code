@@ -8,10 +8,19 @@ pub fn process_lines_of_file(
 	mut cb: impl FnMut(&str) -> anyhow::Result<()>,
 ) -> anyhow::Result<()> {
 	let mut line = String::with_capacity(16);
-	let mut data = BufReader::new(File::open(filepath)?);
-	while data.read_line(&mut line)? > 0 {
-		cb(&line).with_context(|| format!("Failed parsing line: {}", line))?;
-		line.clear();
+	if filepath == Path::new("-") {
+		let stdin = std::io::stdin();
+		let mut handle = stdin.lock();
+		while handle.read_line(&mut line).unwrap() > 0 {
+			cb(&line).with_context(|| format!("Failed parsing line: {}", line))?;
+			line.clear();
+		}
+	} else {
+		let mut data = BufReader::new(File::open(filepath)?);
+		while data.read_line(&mut line)? > 0 {
+			cb(&line).with_context(|| format!("Failed parsing line: {}", line))?;
+			line.clear();
+		}
 	}
 	Ok(())
 }
