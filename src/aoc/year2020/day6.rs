@@ -1,7 +1,7 @@
 use crate::aoc::helpers::*;
 use crate::AocApp;
 use clap::Parser;
-use std::borrow::Cow;
+
 
 #[derive(Debug, Parser)]
 pub struct Day6 {

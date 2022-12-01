@@ -2,7 +2,7 @@ use crate::aoc::helpers::*;
 use crate::AocApp;
 use anyhow::Context;
 use clap::Parser;
-use std::borrow::Cow;
+
 use std::num::NonZeroU8;
 
 #[derive(Debug, Parser)]

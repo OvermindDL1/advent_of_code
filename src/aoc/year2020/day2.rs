@@ -2,7 +2,7 @@ use crate::aoc::helpers::*;
 use crate::AocApp;
 use anyhow::Context as _;
 use clap::Parser;
-use std::borrow::Cow;
+
 
 #[derive(Debug, Parser)]
 pub struct Day2 {

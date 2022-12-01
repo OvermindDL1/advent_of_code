@@ -1,7 +1,6 @@
 use crate::aoc::helpers::*;
 use crate::AocApp;
 use clap::Parser;
-use std::borrow::Cow;
 
 #[derive(Debug, Parser)]
 pub struct Day1 {
@@ -15,7 +14,7 @@ impl Day1 {
 		let mut highest = [0; 4];
 		process_trimmed_lines_of_file(&self.input, |line| {
 			if line.is_empty() {
-				highest.sort_unstable();
+				highest.sort();
 				highest[0] = 0;
 				return Ok(());
 			}

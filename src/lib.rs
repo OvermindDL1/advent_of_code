@@ -1,6 +1,6 @@
 pub mod aoc;
 
-use anyhow::Context;
+
 use clap::Parser;
 use std::time::Instant;
 

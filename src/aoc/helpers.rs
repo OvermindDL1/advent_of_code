@@ -2,7 +2,7 @@ use crate::Inputs;
 use anyhow::{bail, Context};
 use std::borrow::Cow;
 use std::ffi::OsStr;
-use std::fmt::{Display, Formatter, Write};
+use std::fmt::{Display, Formatter};
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::path::PathBuf;

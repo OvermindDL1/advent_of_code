@@ -3,7 +3,7 @@ use crate::AocApp;
 use anyhow::Context;
 use clap::Parser;
 use smol_str::SmolStr;
-use std::borrow::Cow;
+
 
 #[derive(Debug, Parser)]
 pub struct Day4 {

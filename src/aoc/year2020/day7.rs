@@ -4,7 +4,7 @@ use anyhow::Context;
 use clap::Parser;
 use petgraph::prelude::*;
 use smol_str::SmolStr;
-use std::borrow::Cow;
+
 use std::collections::{HashMap, HashSet};
 
 #[derive(Debug, Parser)]
