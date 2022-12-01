@@ -10,11 +10,23 @@ pub struct Day1 {
 }
 
 impl Day1 {
+	pub fn sort_up(d: &mut [usize; 4]) {
+		if d[0] > d[1] {
+			d.swap(0, 1);
+		}
+		if d[1] > d[2] {
+			d.swap(1, 2);
+		}
+		if d[2] > d[3] {
+			d.swap(2, 3);
+		}
+	}
+
 	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
 		let mut highest = [0; 4];
 		process_trimmed_lines_of_file(&self.input, |line| {
 			if line.is_empty() {
-				highest.sort();
+				Self::sort_up(&mut highest);
 				highest[0] = 0;
 				return Ok(());
 			}
@@ -22,7 +34,7 @@ impl Day1 {
 			Ok(())
 		})?;
 		if highest[0] != 0 {
-			highest.sort();
+			Self::sort_up(&mut highest);
 			highest[0] = 0;
 		}
 		println!("Step 1: {}", highest[3]);
