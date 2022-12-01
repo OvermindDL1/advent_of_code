@@ -6,6 +6,7 @@ pub mod year2018;
 pub mod year2019;
 pub mod year2020;
 pub mod year2021;
+pub mod year2022;
 
 use crate::AocApp;
 use clap::Parser;
@@ -54,6 +55,12 @@ pub enum AocYear {
 		#[clap(subcommand)]
 		day: year2021::Year2021,
 	},
+	/// Advent of Code 2022
+	#[clap(name = "2022")]
+	Year2022 {
+		#[clap(subcommand)]
+		day: year2022::Year2022,
+	},
 }
 
 impl AocYear {
@@ -66,6 +73,7 @@ impl AocYear {
 			AocYear::Year2019 { day } => day.run(app),
 			AocYear::Year2020 { day } => day.run(app),
 			AocYear::Year2021 { day } => day.run(app),
+			AocYear::Year2022 { day } => day.run(app),
 		}
 	}
 
@@ -77,6 +85,7 @@ impl AocYear {
 		year2019::Year2019::run_all(app)?;
 		year2020::Year2020::run_all(app)?;
 		year2021::Year2021::run_all(app)?;
+		year2022::Year2022::run_all(app)?;
 		Ok(())
 	}
 }
