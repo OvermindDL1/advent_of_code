@@ -2,14 +2,14 @@ use crate::aoc::helpers::*;
 use crate::AocApp;
 use anyhow::Context;
 use clap::Parser;
+use std::borrow::Cow;
 use std::num::NonZeroU8;
-use std::path::PathBuf;
 
 #[derive(Debug, Parser)]
 pub struct Day2 {
 	/// The input file of "commands"
-	#[clap(default_value = "inputs/2021/day2.input")]
-	pub input_file: PathBuf,
+	#[clap(default_value_t = DataFrom::Internal {year: 2021, day: 2})]
+	pub input: DataFrom,
 }
 
 enum Commands {
@@ -33,7 +33,7 @@ impl Pos {
 
 impl Day2 {
 	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
-		let commands = map_trimmed_nonempty_lines_of_file(&self.input_file, |line| {
+		let commands = map_trimmed_nonempty_lines_of_file(&self.input, |line| {
 			match line
 				.split_once(' ')
 				.context("input is not a command then space then a number")?

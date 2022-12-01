@@ -3,14 +3,14 @@ use crate::AocApp;
 use anyhow::Context;
 use clap::Parser;
 use itertools::Itertools;
-use std::path::PathBuf;
+use std::borrow::Cow;
 use std::str::FromStr;
 
 #[derive(Debug, Parser)]
 pub struct Day5 {
 	/// The input file to use with the parseable seat data
-	#[clap(default_value = "inputs/2020/day5.input")]
-	pub input_file: PathBuf,
+	#[clap(default_value_t = DataFrom::Internal {year: 2020, day: 5})]
+	pub input: DataFrom,
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -46,7 +46,7 @@ impl FromStr for Seat {
 impl Day5 {
 	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
 		let mut seats =
-			map_trimmed_nonempty_lines_of_file(&self.input_file, |line| Ok(line.parse::<Seat>()?))?;
+			map_trimmed_nonempty_lines_of_file(&self.input, |line| Ok(line.parse::<Seat>()?))?;
 		seats.sort_unstable();
 		println!("Step 1: {}", seats.last().context("no seats")?.0);
 		println!(

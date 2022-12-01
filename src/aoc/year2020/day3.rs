@@ -1,18 +1,17 @@
 use crate::aoc::helpers::*;
 use crate::AocApp;
 use clap::Parser;
-use std::path::PathBuf;
+use std::borrow::Cow;
 
 #[derive(Debug, Parser)]
 pub struct Day3 {
-	/// The input file to use with the parseable data blank line delimited
-	#[clap(default_value = "inputs/2020/day3.input")]
-	pub input_file: PathBuf,
+	#[clap(default_value_t = DataFrom::Internal {year: 2020, day: 3})]
+	pub input: DataFrom,
 }
 
 impl Day3 {
 	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
-		let map = map_trimmed_nonempty_lines_of_file(&self.input_file, |line| {
+		let map = map_trimmed_nonempty_lines_of_file(&self.input, |line| {
 			Ok(line
 				.chars()
 				.map(|c| match c {

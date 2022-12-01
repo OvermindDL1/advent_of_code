@@ -2,15 +2,15 @@ use crate::aoc::helpers::*;
 use crate::AocApp;
 use anyhow::Context;
 use clap::Parser;
+use std::borrow::Cow;
 use std::fmt::{Debug, Formatter};
-use std::path::PathBuf;
 use std::str::FromStr;
 
 #[derive(Debug, Parser)]
 pub struct Day5 {
 	/// The input file of lines as coordinates
-	#[clap(default_value = "inputs/2021/day5.input")]
-	pub input_file: PathBuf,
+	#[clap(default_value_t = DataFrom::Internal {year: 2021, day: 5})]
+	pub input: DataFrom,
 }
 
 #[derive(Debug)]
@@ -125,7 +125,7 @@ impl Grid {
 
 impl Day5 {
 	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
-		let lines = map_trimmed_nonempty_lines_of_file(&self.input_file, Line::from_str)?;
+		let lines = map_trimmed_nonempty_lines_of_file(&self.input, Line::from_str)?;
 		let size = lines.iter().fold((0, 0), |(x, y), line| {
 			let (min_x, min_y) = line.get_minimum_size();
 			(x.max(min_x), y.max(min_y))

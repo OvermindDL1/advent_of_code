@@ -4,21 +4,21 @@ use anyhow::Context;
 use clap::Parser;
 use petgraph::prelude::*;
 use smol_str::SmolStr;
+use std::borrow::Cow;
 use std::collections::{HashMap, HashSet};
-use std::path::PathBuf;
 
 #[derive(Debug, Parser)]
 pub struct Day7 {
 	/// The input file to use with the parseable rules
-	#[clap(default_value = "inputs/2020/day7.input")]
-	pub input_file: PathBuf,
+	#[clap(default_value_t = DataFrom::Internal {year: 2020, day: 7})]
+	pub input: DataFrom,
 }
 
 impl Day7 {
 	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
 		let mut rules_graph = Graph::new();
 		let mut rules = HashMap::with_capacity(1024);
-		process_trimmed_nonempty_lines_of_file(&self.input_file, |line| {
+		process_trimmed_nonempty_lines_of_file(&self.input, |line| {
 			let (this_bag, can_contain) = line
 				.split_once(" bags contain ")
 				.context("invalid bag rule specifier")?;

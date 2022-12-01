@@ -3,13 +3,13 @@ use crate::AocApp;
 use anyhow::Context;
 use clap::Parser;
 use smol_str::SmolStr;
-use std::path::PathBuf;
+use std::borrow::Cow;
 
 #[derive(Debug, Parser)]
 pub struct Day4 {
 	/// The input file to use with the parseable data blank line delimited
-	#[clap(default_value = "inputs/2020/day4.input")]
-	pub input_file: PathBuf,
+	#[clap(default_value_t = DataFrom::Internal {year: 2020, day: 4})]
+	pub input: DataFrom,
 }
 
 #[derive(Default)]
@@ -90,7 +90,7 @@ impl Day4 {
 	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
 		let mut current = Passport::default();
 		let mut passports = Vec::with_capacity(512);
-		process_trimmed_lines_of_file(&self.input_file, |line| {
+		process_trimmed_lines_of_file(&self.input, |line| {
 			if line.is_empty() {
 				passports.push(std::mem::take(&mut current));
 			} else {

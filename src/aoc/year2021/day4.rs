@@ -2,13 +2,13 @@ use crate::aoc::helpers::*;
 use crate::AocApp;
 use anyhow::Context;
 use clap::Parser;
-use std::path::PathBuf;
+use std::borrow::Cow;
 
 #[derive(Debug, Parser)]
 pub struct Day4 {
 	/// The input file of bingo calls and cards
-	#[clap(default_value = "inputs/2021/day4.input")]
-	pub input_file: PathBuf,
+	#[clap(default_value_t = DataFrom::Internal {year: 2021, day: 4})]
+	pub input: DataFrom,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -90,7 +90,7 @@ impl Day4 {
 		let mut cards = Vec::with_capacity(128);
 		let mut card: Card = Default::default();
 		let mut card_line = 0;
-		process_trimmed_nonempty_lines_of_file(&self.input_file, |line| {
+		process_trimmed_nonempty_lines_of_file(&self.input, |line| {
 			if calls.is_empty() {
 				for num in line.split(',') {
 					calls.push(num.parse::<u8>().context("Failed to parse number")?);

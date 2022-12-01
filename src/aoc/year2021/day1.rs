@@ -2,22 +2,19 @@ use crate::aoc::helpers::*;
 use crate::AocApp;
 use clap::Parser;
 use itertools::Itertools;
-use std::path::PathBuf;
+use std::borrow::Cow;
 
 #[derive(Debug, Parser)]
 pub struct Day1 {
 	/// The input file of "depths"
-	#[clap(default_value = "inputs/2021/day1.input")]
-	pub input_file: PathBuf,
+	#[clap(default_value_t = DataFrom::Internal {year: 2021, day: 1})]
+	pub input: DataFrom,
 }
 
 impl Day1 {
 	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
 		let nums =
-			map_trimmed_nonempty_lines_of_file(
-				&self.input_file,
-				|line| Ok(line.parse::<usize>()?),
-			)?;
+			map_trimmed_nonempty_lines_of_file(&self.input, |line| Ok(line.parse::<usize>()?))?;
 		println!(
 			"Step 1: {}",
 			nums.iter()

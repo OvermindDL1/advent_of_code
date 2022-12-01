@@ -3,20 +3,20 @@ use crate::AocApp;
 use anyhow::Context;
 use clap::Parser;
 use itertools::Itertools;
+use std::borrow::Cow;
 use std::cmp::Ordering;
-use std::path::PathBuf;
 
 #[derive(Debug, Parser)]
 pub struct Day3 {
 	/// The input file of "diagnostic bits"
-	#[clap(default_value = "inputs/2021/day3.input")]
-	pub input_file: PathBuf,
+	#[clap(default_value_t = DataFrom::Internal {year: 2021, day: 3})]
+	pub input: DataFrom,
 }
 
 impl Day3 {
 	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
 		let mut width = 0;
-		let mut nums = map_trimmed_nonempty_lines_of_file(&self.input_file, |line| {
+		let mut nums = map_trimmed_nonempty_lines_of_file(&self.input, |line| {
 			width = line.as_bytes().len();
 			Ok(u32::from_str_radix(line, 2)?)
 		})?;

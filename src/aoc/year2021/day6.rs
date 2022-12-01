@@ -2,13 +2,13 @@ use crate::aoc::helpers::*;
 use crate::AocApp;
 use anyhow::Context;
 use clap::Parser;
-use std::path::PathBuf;
+use std::borrow::Cow;
 
 #[derive(Debug, Parser)]
 pub struct Day6 {
 	/// The input file of
-	#[clap(default_value = "inputs/2021/day6.input")]
-	pub input_file: PathBuf,
+	#[clap(default_value_t = DataFrom::Internal {year: 2021, day: 6})]
+	pub input: DataFrom,
 }
 
 #[derive(Debug, Default)]
@@ -36,7 +36,7 @@ impl LifeStateCounts {
 impl Day6 {
 	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
 		let mut counts = LifeStateCounts::default();
-		process_trimmed_nonempty_lines_of_file(&self.input_file, |line| {
+		process_trimmed_nonempty_lines_of_file(&self.input, |line| {
 			for num in line.split(',') {
 				let num: usize = num
 					.parse()

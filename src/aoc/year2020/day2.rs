@@ -2,20 +2,20 @@ use crate::aoc::helpers::*;
 use crate::AocApp;
 use anyhow::Context as _;
 use clap::Parser;
-use std::path::PathBuf;
+use std::borrow::Cow;
 
 #[derive(Debug, Parser)]
 pub struct Day2 {
 	/// The input file to use with the parseable type per line
-	#[clap(default_value = "inputs/2020/day2.input")]
-	pub input_file: PathBuf,
+	#[clap(default_value_t = DataFrom::Internal {year: 2020, day: 2})]
+	pub input: DataFrom,
 }
 
 impl Day2 {
 	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
 		let mut valid_count_1 = 0;
 		let mut valid_count_2 = 0;
-		process_trimmed_nonempty_lines_of_file(&self.input_file, |line| {
+		process_trimmed_nonempty_lines_of_file(&self.input, |line| {
 			match Self::is_valid(line)? {
 				(true, true) => {
 					valid_count_1 += 1;

@@ -1,20 +1,20 @@
 use crate::aoc::helpers::*;
 use crate::AocApp;
 use clap::Parser;
-use std::path::PathBuf;
+use std::borrow::Cow;
 
 #[derive(Debug, Parser)]
 pub struct Day6 {
 	/// The input file to use with the parseable data blank line delimited
-	#[clap(default_value = "inputs/2020/day6.input")]
-	pub input_file: PathBuf,
+	#[clap(default_value_t = DataFrom::Internal {year: 2020, day: 6})]
+	pub input: DataFrom,
 }
 
 impl Day6 {
 	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
 		let mut current = (0u32, u32::MAX);
 		let mut groups = Vec::with_capacity(512);
-		process_trimmed_lines_of_file(&self.input_file, |line| {
+		process_trimmed_lines_of_file(&self.input, |line| {
 			if line.is_empty() {
 				groups.push(current);
 				current = (0, u32::MAX);

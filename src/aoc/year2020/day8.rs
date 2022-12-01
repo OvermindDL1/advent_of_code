@@ -2,14 +2,14 @@ use crate::aoc::helpers::*;
 use crate::AocApp;
 use anyhow::Context;
 use clap::Parser;
-use std::path::PathBuf;
+use std::borrow::Cow;
 use std::str::FromStr;
 
 #[derive(Debug, Parser)]
 pub struct Day8 {
 	/// The input file to use with the parseable instructions
-	#[clap(default_value = "inputs/2020/day8.input")]
-	pub input_file: PathBuf,
+	#[clap(default_value_t = DataFrom::Internal {year: 2020, day: 8})]
+	pub input: DataFrom,
 }
 
 #[derive(Debug)]
@@ -120,7 +120,7 @@ impl Program {
 
 impl Day8 {
 	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
-		let insns = map_trimmed_nonempty_lines_of_file(&self.input_file, |line| {
+		let insns = map_trimmed_nonempty_lines_of_file(&self.input, |line| {
 			line.parse::<Insns>().context("Failed to parse instruction")
 		})?;
 		let mut program = Program::new(insns);

@@ -1,14 +1,17 @@
 pub mod aoc;
 
-use std::time::Instant;
-// use chrono::prelude::*;
+use anyhow::Context;
 use clap::Parser;
-//use once_cell::sync::Lazy;
+use std::time::Instant;
+
+#[derive(rust_embed::RustEmbed)]
+#[folder = "inputs"]
+pub struct Inputs;
 
 #[derive(Debug, Parser)]
 pub struct AocApp {
 	/// Level of verbosity, can be used multiple times for more verbosity
-	#[clap(short, long, parse(from_occurrences))]
+	#[clap(short, long, action = clap::ArgAction::Count)]
 	pub verbose: u8,
 	/// The command to execute
 	#[clap(subcommand)]
