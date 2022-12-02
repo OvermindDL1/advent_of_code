@@ -2,7 +2,6 @@ use crate::aoc::helpers::*;
 use crate::AocApp;
 use clap::Parser;
 
-
 #[derive(Debug, Parser)]
 pub struct Day6 {
 	/// The input file to use with the parseable data blank line delimited

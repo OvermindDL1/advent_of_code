@@ -3,7 +3,6 @@ use crate::AocApp;
 use anyhow::Context as _;
 use clap::Parser;
 
-
 #[derive(Debug, Parser)]
 pub struct Day2 {
 	/// The input file to use with the parseable type per line

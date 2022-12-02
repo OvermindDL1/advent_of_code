@@ -4,7 +4,6 @@ use anyhow::Context;
 use clap::Parser;
 use smol_str::SmolStr;
 
-
 #[derive(Debug, Parser)]
 pub struct Day4 {
 	/// The input file to use with the parseable data blank line delimited

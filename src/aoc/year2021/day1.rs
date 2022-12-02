@@ -3,7 +3,6 @@ use crate::AocApp;
 use clap::Parser;
 use itertools::Itertools;
 
-
 #[derive(Debug, Parser)]
 pub struct Day1 {
 	/// The input file of "depths"

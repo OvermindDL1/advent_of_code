@@ -2,7 +2,6 @@ use crate::aoc::helpers::*;
 use crate::AocApp;
 use clap::Parser;
 
-
 #[derive(Debug, Parser)]
 pub struct Day3 {
 	#[clap(default_value_t = DataFrom::Internal {year: 2020, day: 3})]

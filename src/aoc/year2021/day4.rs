@@ -3,7 +3,6 @@ use crate::AocApp;
 use anyhow::Context;
 use clap::Parser;
 
-
 #[derive(Debug, Parser)]
 pub struct Day4 {
 	/// The input file of bingo calls and cards
