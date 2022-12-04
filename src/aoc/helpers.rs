@@ -4,7 +4,7 @@ use std::borrow::Cow;
 use std::ffi::OsStr;
 use std::fmt::{Display, Formatter};
 use std::fs::File;
-use std::io::{BufRead, BufReader};
+use std::io::{BufRead, BufReader, Read};
 use std::path::PathBuf;
 use std::str::FromStr;
 
@@ -14,6 +14,63 @@ pub enum DataFrom {
 	Static(Cow<'static, str>),
 	Stdin,
 	FilePath(PathBuf),
+}
+
+impl DataFrom {
+	pub fn as_cow_str(&self) -> Cow<str> {
+		match self {
+			DataFrom::Internal { year, day } => {
+				let path = format!("{year}/day{day}.input");
+				let data = Inputs::get(&path)
+					.with_context(|| format!("missing {}", &path))
+					.expect("invalid internal input year and/or day");
+				Cow::Owned(
+					String::from_utf8(data.data.as_ref().to_vec())
+						.expect("input must be valid utf-8"),
+				)
+			}
+			DataFrom::Static(data) => data.clone(),
+			DataFrom::Stdin => {
+				let mut data = Vec::default();
+				std::io::stdin()
+					.read_to_end(&mut data)
+					.expect("invalid read from stdin");
+				Cow::Owned(String::from_utf8(data).expect("input must be valid utf-8"))
+			}
+			DataFrom::FilePath(path) => {
+				let data = std::fs::read_to_string(path)
+					.with_context(|| format!("invalid read from path: {path:?}"))
+					.unwrap();
+				Cow::Owned(data)
+			}
+		}
+	}
+
+	pub fn as_cow_u8(&self) -> Cow<[u8]> {
+		match self {
+			DataFrom::Internal { year, day } => {
+				let path = format!("{year}/day{day}.input");
+				let data = Inputs::get(&path)
+					.with_context(|| format!("missing {}", &path))
+					.expect("invalid internal year day");
+				data.data
+			}
+			DataFrom::Static(data) => Cow::Borrowed(data.as_bytes()),
+			DataFrom::Stdin => {
+				let mut data = Vec::default();
+				std::io::stdin()
+					.read_to_end(&mut data)
+					.expect("invalid read from stdin");
+				Cow::Owned(data)
+			}
+			DataFrom::FilePath(path) => {
+				let data = std::fs::read(path)
+					.with_context(|| format!("invalid read from path: {path:?}"))
+					.unwrap();
+				Cow::Owned(data)
+			}
+		}
+	}
 }
 
 impl Display for DataFrom {
@@ -139,4 +196,17 @@ pub fn map_trimmed_nonempty_lines_of_file<R, F: FnMut(&str) -> anyhow::Result<R>
 		Ok(())
 	})?;
 	Ok(results)
+}
+
+pub fn fold_trimmed_nonempty_lines_of_file<R, F: FnMut(R, &str) -> anyhow::Result<R>>(
+	data: &DataFrom,
+	acc: R,
+	mut cb: F,
+) -> anyhow::Result<R> {
+	let mut acc = Some(acc);
+	process_trimmed_nonempty_lines_of_file(data, |line| {
+		acc = Some(cb(acc.take().unwrap(), line)?);
+		Ok(())
+	})?;
+	Ok(acc.take().unwrap())
 }
