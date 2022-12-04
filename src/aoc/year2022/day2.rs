@@ -13,7 +13,7 @@ impl Day2 {
 	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
 		let mut score1 = 0;
 		let mut score2 = 0;
-		map_trimmed_nonempty_lines_of_file(&self.input, |line| {
+		process_trimmed_nonempty_lines_of_file(&self.input, |line| {
 			let line = &line.as_bytes()[0..=2];
 			let l = line[0] as i8 - 'A' as i8 + 1;
 			let r = line[2] as i8 - 'X' as i8 + 1;

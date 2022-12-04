@@ -186,6 +186,21 @@ pub fn process_trimmed_nonempty_lines_of_file(
 	})
 }
 
+pub fn flat_map_trimmed_nonempty_lines_of_file<
+	R: IntoIterator,
+	F: FnMut(&str) -> anyhow::Result<R>,
+>(
+	data: &DataFrom,
+	mut cb: F,
+) -> anyhow::Result<Vec<<R as IntoIterator>::Item>> {
+	let mut results = Vec::with_capacity(8192);
+	process_trimmed_nonempty_lines_of_file(data, |line| {
+		results.extend(cb(line)?);
+		Ok(())
+	})?;
+	Ok(results)
+}
+
 pub fn map_trimmed_nonempty_lines_of_file<R, F: FnMut(&str) -> anyhow::Result<R>>(
 	data: &DataFrom,
 	mut cb: F,
