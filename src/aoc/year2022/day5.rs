@@ -4,6 +4,7 @@ use anyhow::Context;
 use clap::Parser;
 use itertools::Itertools;
 use std::fmt::{Display, Formatter};
+use std::str::FromStr;
 
 #[derive(Debug, Parser)]
 pub struct Day5 {
@@ -31,8 +32,10 @@ impl Display for Move {
 	}
 }
 
-impl Move {
-	fn parse(s: &str) -> anyhow::Result<Move> {
+impl FromStr for Move {
+	type Err = anyhow::Error;
+
+	fn from_str(s: &str) -> Result<Self, Self::Err> {
 		let (count, from, to) = s
 			.split_whitespace()
 			.flat_map(str::parse::<usize>)
@@ -42,7 +45,9 @@ impl Move {
 		let to = to - 1;
 		Ok(Move { count, from, to })
 	}
+}
 
+impl Move {
 	fn perform(&self, stacks: &mut CrateStacks) {
 		assert!(self.to < stacks.0.len() && self.from < stacks.0.len());
 		for _ in 0..self.count {
@@ -87,8 +92,10 @@ impl Display for CrateStacks {
 	}
 }
 
-impl CrateStacks {
-	fn parse(input: &str) -> anyhow::Result<CrateStacks> {
+impl FromStr for CrateStacks {
+	type Err = anyhow::Error;
+
+	fn from_str(input: &str) -> Result<Self, Self::Err> {
 		let input = input.as_bytes();
 		let mut stacks = vec![];
 		let mut input_stacks = input.rsplit(|&c| c == b'\n');
@@ -122,11 +129,11 @@ impl Day5 {
 			.context("input has no blank line to split on")?;
 		let input_commands = input_commands.trim_start();
 
-		let mut stacks = CrateStacks::parse(input_stacks)?;
+		let mut stacks = input_stacks.parse::<CrateStacks>()?;
 		let moves = input_commands
 			.lines()
-			.map(Move::parse)
-			.collect::<anyhow::Result<Vec<_>>>()?;
+			.map(FromStr::from_str)
+			.collect::<anyhow::Result<Vec<Move>>>()?;
 		let mut stacks2 = stacks.clone();
 
 		// println!("{stacks}");
