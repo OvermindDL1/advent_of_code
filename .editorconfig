@@ -8,3 +8,6 @@ trim_trailing_whitespace = true
 
 [*.rs]
 indent_style = tab
+
+[*.input]
+trim_trailing_whitespace = false
