@@ -2,6 +2,7 @@ use crate::aoc::helpers::*;
 use crate::AocApp;
 use anyhow::{bail, Context};
 use clap::Parser;
+use itertools::Itertools;
 
 #[derive(Debug, Parser)]
 pub struct Day3 {
@@ -40,10 +41,7 @@ impl Day3 {
 		}
 
 		let mut score2 = 0;
-		for lines in lines.chunks_exact(3) {
-			let [l0, l1, l2] = lines else {
-				bail!("invalid row count for badges")
-			};
+		for (l0, l1, l2) in lines.iter().tuples() {
 			let badge = l0
 				.iter()
 				.cloned()
