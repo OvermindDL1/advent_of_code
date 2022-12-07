@@ -4,6 +4,7 @@ pub mod day3;
 pub mod day4;
 pub mod day5;
 pub mod day6;
+pub mod day7;
 
 use crate::AocApp;
 use clap::Parser;
@@ -30,14 +31,22 @@ pub enum Year2022 {
 	/// Advent of Code 2022, Day 6 - Tuning Trouble
 	#[clap(name = "6")]
 	Day6(day6::Day6),
+	/// Advent of Code 2022, Day 7 - No Space Left On Device
+	#[clap(name = "7")]
+	Day7(day7::Day7),
 }
 
 impl Year2022 {
 	pub fn run(&self, app: &AocApp) -> anyhow::Result<()> {
-		crate::run_days!(Year2022, self, app, [Day1, Day2, Day3, Day4, Day5, Day6])
+		crate::run_days!(
+			Year2022,
+			self,
+			app,
+			[Day1, Day2, Day3, Day4, Day5, Day6, Day7]
+		)
 	}
 
 	pub fn run_all(app: &AocApp) -> anyhow::Result<()> {
-		crate::run_all_days!(Year2022, app, [Day1, Day2, Day3, Day4, Day5, Day6])
+		crate::run_all_days!(Year2022, app, [Day1, Day2, Day3, Day4, Day5, Day6, Day7])
 	}
 }
