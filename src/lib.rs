@@ -31,7 +31,7 @@ impl AocApp {
 			AocAppCommand::RunAll => {
 				println!("# OvermindDL1's Advent Of Code");
 				let start = Instant::now();
-				let res = aoc::AocYear::run_all(&self);
+				let res = aoc::AocYear::run_all(self);
 				if self.verbose >= 1 {
 					println!("_All Time Taken: {:?}_", start.elapsed());
 				}
