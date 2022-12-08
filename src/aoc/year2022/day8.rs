@@ -3,7 +3,9 @@ use crate::AocApp;
 use clap::Parser;
 use itertools::Itertools;
 use std::fmt::Display;
+use std::io::Write;
 use std::ops::Range;
+use termcolor::{BufferWriter, Color, ColorSpec, WriteColor};
 
 #[derive(Debug, Parser)]
 pub struct Day8 {
@@ -90,13 +92,47 @@ impl HeightMap {
 		for y in 0..self.length() {
 			for x in 0..self.width() {
 				if self.is_visible(x, y) {
-					print!("V");
+					print!("🌲");
 				} else {
-					print!(" ");
+					print!("  ");
 				}
 			}
 			println!();
 		}
+		println!();
+	}
+
+	const COLORS: [Color; 10] = [
+		Color::Rgb(0, 255 / 10, 0),
+		Color::Rgb(0, 255 / 9, 0),
+		Color::Rgb(0, 255 / 8, 0),
+		Color::Rgb(0, 255 / 7, 0),
+		Color::Rgb(0, 255 / 6, 0),
+		Color::Rgb(0, 255 / 5, 0),
+		Color::Rgb(0, 255 / 4, 0),
+		Color::Rgb(0, 255 / 3, 0),
+		Color::Rgb(0, 255 / 2, 0),
+		Color::Rgb(0, 255, 0),
+	];
+
+	#[allow(dead_code)]
+	fn print_trees(&self) -> anyhow::Result<()> {
+		let bufw = BufferWriter::stdout(termcolor::ColorChoice::Always);
+		for (i, &height) in self.heights.iter().enumerate() {
+			let mut buf = bufw.buffer();
+			if i % self.width == 0 {
+				writeln!(&mut buf)?;
+			}
+			buf.set_color(ColorSpec::new().set_fg(Some(Self::COLORS[height as usize])))
+				.unwrap();
+			write!(&mut buf, "X")?;
+			bufw.print(&buf)?;
+		}
+		let mut buf = bufw.buffer();
+		writeln!(&mut buf)?;
+		buf.reset()?;
+		bufw.print(&buf)?;
+		Ok(())
 	}
 
 	fn count_visible(&self) -> usize {
@@ -152,6 +188,7 @@ impl Day8 {
 
 		let map = HeightMap::from(input);
 		// println!("{}", &map);
+		// map.print_trees()?;
 		// map.print_visible();
 
 		println!("Step 1: {}", map.count_visible());
