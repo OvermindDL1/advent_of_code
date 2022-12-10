@@ -43,7 +43,7 @@ pub enum Year2022 {
 	/// Advent of Code 2022, Day 9 - Rope Bridge
 	#[clap(name = "9")]
 	Day9(day9::Day9),
-	/// Advent of Code 2022, Day 10 -
+	/// Advent of Code 2022, Day 10 - Cathode-Ray Tube
 	#[clap(name = "10")]
 	Day10(day10::Day10),
 }
