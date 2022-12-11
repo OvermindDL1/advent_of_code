@@ -1,8 +1,8 @@
 use crate::aoc::helpers::*;
 use crate::AocApp;
+use ahash::AHashSet;
 use anyhow::bail;
 use clap::Parser;
-use std::collections::HashSet;
 
 #[derive(Debug, Parser)]
 pub struct Day9 {
@@ -12,14 +12,14 @@ pub struct Day9 {
 }
 
 struct State {
-	knots: [(isize, isize); 10],
-	touched1: HashSet<(isize, isize)>,
-	touched9: HashSet<(isize, isize)>,
+	knots: [(i16, i16); 10],
+	touched1: AHashSet<(i16, i16)>,
+	touched9: AHashSet<(i16, i16)>,
 }
 
 impl Default for State {
 	fn default() -> Self {
-		let mut touched1 = HashSet::new();
+		let mut touched1 = AHashSet::with_capacity(1024);
 		touched1.insert((0, 0));
 		let touched9 = touched1.clone();
 		Self {
@@ -31,24 +31,33 @@ impl Default for State {
 }
 
 impl State {
-	fn move_dir(&mut self, dir: (isize, isize)) {
+	fn move_dir(&mut self, dir: (i16, i16)) {
 		let (mut head, rest) = self
 			.knots
 			.split_first_mut()
 			.expect("knots is empty somehow");
 		head.0 += dir.0;
 		head.1 += dir.1;
-		for tail in rest {
+		for (i, tail) in rest.iter_mut().enumerate() {
 			let (dx, dy) = (head.0 - tail.0, head.1 - tail.1);
 			if dx.abs() <= 1 && dy.abs() <= 1 {
 				break;
 			}
 			tail.0 += dx.signum();
 			tail.1 += dy.signum();
+			match i {
+				0 => {
+					self.touched1.insert((tail.0, tail.1));
+				}
+				8 => {
+					self.touched9.insert((tail.0, tail.1));
+				}
+				_ => {}
+			}
 			head = tail;
 		}
-		self.touched1.insert(self.knots[1]);
-		self.touched9.insert(self.knots[9]);
+		// self.touched1.insert(self.knots[1]);
+		// self.touched9.insert(self.knots[9]);
 	}
 }
 
