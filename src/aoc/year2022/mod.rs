@@ -51,7 +51,7 @@ pub enum Year2022 {
 	/// Advent of Code 2022, Day 11 - Monkey in the Middle
 	#[clap(name = "11")]
 	Day11(day11::Day11),
-	/// Advent of Code 2022, Day 12 -
+	/// Advent of Code 2022, Day 12 - Hill Climbing Algorithm
 	#[clap(name = "12")]
 	Day12(day12::Day12),
 }

@@ -181,6 +181,7 @@ impl Day11 {
 	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
 		let input = self.input.as_cow_str();
 		let input = input.as_ref();
+
 		let mut monkeys: Vec<Monkey> = input
 			.split("\n\n")
 			.map(Monkey::from_str)
