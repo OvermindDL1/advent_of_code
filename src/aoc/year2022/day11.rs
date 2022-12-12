@@ -8,7 +8,7 @@ use std::str::FromStr;
 
 #[derive(Debug, Parser)]
 pub struct Day11 {
-	/// The input file of ""
+	/// The input file of "monkeys"
 	#[clap(default_value_t = DataFrom::Internal {year: 2022, day: 11})]
 	pub input: DataFrom,
 }
