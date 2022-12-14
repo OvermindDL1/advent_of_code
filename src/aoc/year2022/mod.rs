@@ -3,6 +3,7 @@ pub mod day10;
 pub mod day11;
 pub mod day12;
 pub mod day13;
+pub mod day14;
 pub mod day2;
 pub mod day3;
 pub mod day4;
@@ -58,6 +59,9 @@ pub enum Year2022 {
 	/// Advent of Code 2022, Day 13 - Distress Signal
 	#[clap(name = "13")]
 	Day13(day13::Day13),
+	/// Advent of Code 2022, Day 14 - Regolith Reservoir
+	#[clap(name = "14")]
+	Day14(day14::Day14),
 }
 
 impl Year2022 {
@@ -66,7 +70,10 @@ impl Year2022 {
 			Year2022,
 			self,
 			app,
-			[Day1, Day2, Day3, Day4, Day5, Day6, Day7, Day8, Day9, Day10, Day11, Day12, Day13]
+			[
+				Day1, Day2, Day3, Day4, Day5, Day6, Day7, Day8, Day9, Day10, Day11, Day12, Day13,
+				Day14
+			]
 		)
 	}
 
@@ -74,7 +81,10 @@ impl Year2022 {
 		crate::run_all_days!(
 			Year2022,
 			app,
-			[Day1, Day2, Day3, Day4, Day5, Day6, Day7, Day8, Day9, Day10, Day11, Day12, Day13]
+			[
+				Day1, Day2, Day3, Day4, Day5, Day6, Day7, Day8, Day9, Day10, Day11, Day12, Day13,
+				Day14
+			]
 		)
 	}
 }
