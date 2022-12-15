@@ -4,6 +4,7 @@ pub mod day11;
 pub mod day12;
 pub mod day13;
 pub mod day14;
+pub mod day15;
 pub mod day2;
 pub mod day3;
 pub mod day4;
@@ -62,6 +63,9 @@ pub enum Year2022 {
 	/// Advent of Code 2022, Day 14 - Regolith Reservoir
 	#[clap(name = "14")]
 	Day14(day14::Day14),
+	/// Advent of Code 2022, Day 15 - Beacon Exclusion Zone
+	#[clap(name = "15")]
+	Day15(day15::Day15),
 }
 
 impl Year2022 {
@@ -72,7 +76,7 @@ impl Year2022 {
 			app,
 			[
 				Day1, Day2, Day3, Day4, Day5, Day6, Day7, Day8, Day9, Day10, Day11, Day12, Day13,
-				Day14
+				Day14, Day15
 			]
 		)
 	}
@@ -83,7 +87,7 @@ impl Year2022 {
 			app,
 			[
 				Day1, Day2, Day3, Day4, Day5, Day6, Day7, Day8, Day9, Day10, Day11, Day12, Day13,
-				Day14
+				Day14, Day15
 			]
 		)
 	}

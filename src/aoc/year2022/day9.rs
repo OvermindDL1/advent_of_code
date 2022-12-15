@@ -56,8 +56,6 @@ impl State {
 			}
 			head = tail;
 		}
-		// self.touched1.insert(self.knots[1]);
-		// self.touched9.insert(self.knots[9]);
 	}
 }
 
