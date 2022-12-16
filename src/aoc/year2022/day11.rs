@@ -69,8 +69,8 @@ impl FromStr for Monkey {
 			.split_once('\n')
 			.context("invalid monkey items line")?;
 		let ("Starting items", worries_str) = worries_str.trim().split_once(": ").context("invalid monkey items definition line")? else {
-			bail!("invalid monkey items definition line");
-		};
+				bail!("invalid monkey items definition line");
+			};
 		let worries: VecDeque<Worry> = worries_str
 			.trim()
 			.split(", ")
@@ -83,11 +83,11 @@ impl FromStr for Monkey {
 			.split_once('\n')
 			.context("invalid monkey operation line")?;
 		let ("Operation", operation_str) = operation_str.trim().split_once(": ").context("invalid monkey operation definition line")? else {
-			bail!("invalid monkey operation definition line");
-		};
+				bail!("invalid monkey operation definition line");
+			};
 		let ("new = old ", operation_str) = operation_str.trim().split_at("new = old ".len()) else {
-			bail!("invalid monkey operation action");
-		};
+				bail!("invalid monkey operation action");
+			};
 		let operation = match operation_str.trim().split_at(1) {
 			("+", val) => Op::Add(
 				val.trim()
@@ -108,8 +108,8 @@ impl FromStr for Monkey {
 			.split_once('\n')
 			.context("invalid monkey test line")?;
 		let ("Test: divisible by ", test_div_str) = test_div_str.trim().split_at("Test: divisible by ".len()) else {
-			bail!("invalid monkey test definition line: {test_div_str}");
-		};
+				bail!("invalid monkey test definition line: {test_div_str}");
+			};
 		let test_div = test_div_str
 			.trim()
 			.parse()
@@ -120,11 +120,11 @@ impl FromStr for Monkey {
 			.split_once('\n')
 			.context("invalid monkey if * throw to line")?;
 		let ("If true: throw to monkey ", if_true_throw_to_str) = if_true_throw_to_str.trim().split_at("If true: throw to monkey ".len()) else {
-			bail!("invalid monkey if true throw to definition line: {if_true_throw_to_str}");
-		};
+				bail!("invalid monkey if true throw to definition line: {if_true_throw_to_str}");
+			};
 		let ("If false: throw to monkey ", if_false_throw_to_str) = if_false_throw_to.trim().split_at("If false: throw to monkey ".len()) else {
-			bail!("invalid monkey if false throw to definition line: {if_false_throw_to}");
-		};
+				bail!("invalid monkey if false throw to definition line: {if_false_throw_to}");
+			};
 		let if_true_throw_to = if_true_throw_to_str
 			.trim()
 			.parse()
