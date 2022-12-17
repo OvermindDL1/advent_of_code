@@ -14,7 +14,7 @@ use std::fmt::{Debug, Formatter};
 
 #[derive(Debug, Parser)]
 pub struct Day13 {
-	/// The input file of ""
+	/// The input file of "number lists"
 	#[clap(default_value_t = DataFrom::Internal {year: 2022, day: 13})]
 	pub input: DataFrom,
 }
