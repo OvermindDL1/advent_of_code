@@ -25,14 +25,14 @@ impl Day6 {
 	}
 
 	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
-		let input = self.input.as_cow_str();
+		let input = self.input.as_cow_str()?;
 		let input = input.as_ref().trim();
 
 		let score1 = Self::find_start_of_window(input, 4)?;
 		let score2 = Self::find_start_of_window(input, 14)?;
 
-		println!("Step 1: {}", score1);
-		println!("Step 2: {}", score2);
+		println!("Step 1: {score1}");
+		println!("Step 2: {score2}");
 		Ok(())
 	}
 }

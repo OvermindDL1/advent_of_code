@@ -14,7 +14,7 @@ impl Day1 {
 		let mut highest = [0; 4];
 		process_trimmed_lines_of_file(&self.input, |line| {
 			if line.is_empty() {
-				highest.sort();
+				highest.sort_unstable();
 				highest[0] = 0;
 				return Ok(());
 			}
@@ -22,7 +22,7 @@ impl Day1 {
 			Ok(())
 		})?;
 		if highest[0] != 0 {
-			highest.sort();
+			highest.sort_unstable();
 			highest[0] = 0;
 		}
 		println!("Step 1: {}", highest[3]);

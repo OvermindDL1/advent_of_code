@@ -32,7 +32,7 @@ impl Debug for Grid {
 				if cell == 0 {
 					write!(f, ".")?;
 				} else {
-					write!(f, "{}", cell)?;
+					write!(f, "{cell}")?;
 				}
 			}
 			writeln!(f)?;
@@ -89,6 +89,7 @@ impl Line {
 }
 
 impl Grid {
+	#[allow(clippy::cast_sign_loss)]
 	fn from_lines<'a>(lines: impl IntoIterator<Item = &'a Line>, size: (i32, i32)) -> Grid {
 		let grid = vec![0u8; ((size.0 + 1) * (size.1 + 1)) as usize];
 		let mut grid = Grid(
@@ -113,13 +114,16 @@ impl Grid {
 		}
 	}
 
+	#[allow(clippy::cast_sign_loss)]
 	fn place(&mut self, x: i32, y: i32) {
 		let index = y as usize * self.1 .0 + x as usize;
 		self.0[index] += 1;
 	}
 
-	fn count_above_1(&self) -> u32 {
-		self.0.iter().filter(|&&cell| cell > 1).count() as u32
+	fn count_above_1(&self) -> anyhow::Result<u32> {
+		Ok(u32::try_from(
+			self.0.iter().filter(|&&cell| cell > 1).count(),
+		)?)
 	}
 }
 
@@ -133,8 +137,8 @@ impl Day5 {
 		let grid_step1 = Grid::from_lines(lines.iter().filter(|l| l.is_straight()), size);
 		let grid_step2 = Grid::from_lines(&lines, size);
 
-		println!("Step 1: {}", grid_step1.count_above_1());
-		println!("Step 2: {}", grid_step2.count_above_1());
+		println!("Step 1: {}", grid_step1.count_above_1()?);
+		println!("Step 2: {}", grid_step2.count_above_1()?);
 
 		Ok(())
 	}

@@ -74,7 +74,7 @@ struct CrateStacks(Vec<Vec<u8>>);
 
 impl Display for CrateStacks {
 	fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-		let highest = self.0.iter().map(|v| v.len()).max().unwrap();
+		let highest = self.0.iter().map(Vec::len).max().unwrap();
 		for i in (0..highest).rev() {
 			for stack in &self.0 {
 				if i < stack.len() {
@@ -121,7 +121,7 @@ impl FromStr for CrateStacks {
 
 impl Day5 {
 	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
-		let input = self.input.as_cow_str();
+		let input = self.input.as_cow_str()?;
 		let input = input.as_ref();
 
 		let (input_stacks, input_commands) = input
@@ -145,8 +145,8 @@ impl Day5 {
 		let score1 = stacks
 			.0
 			.iter()
-			.map(|s| *s.last().unwrap() as char)
-			.collect::<String>();
+			.map(|s| Ok(*s.last().context("missing characters in stack1")? as char))
+			.collect::<anyhow::Result<String>>()?;
 
 		// println!("{stacks2}");
 		for m in &moves {
@@ -157,11 +157,11 @@ impl Day5 {
 		let score2 = stacks2
 			.0
 			.iter()
-			.map(|s| *s.last().unwrap() as char)
-			.collect::<String>();
+			.map(|s| Ok(*s.last().context("missing characters in stack2")? as char))
+			.collect::<anyhow::Result<String>>()?;
 
-		println!("Step 1: {}", score1);
-		println!("Step 2: {}", score2);
+		println!("Step 1: {score1}");
+		println!("Step 2: {score2}");
 		Ok(())
 	}
 }

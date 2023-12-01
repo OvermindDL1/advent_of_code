@@ -57,7 +57,7 @@ impl Display for Area {
 				Tile::Stone => '█',
 				Tile::Sand => '▒',
 			};
-			write!(f, "{}", c)?;
+			write!(f, "{c}")?;
 		}
 		writeln!(f)?;
 		for y in 1..self.height() {
@@ -67,7 +67,7 @@ impl Display for Area {
 					Tile::Stone => '█',
 					Tile::Sand => '▒',
 				};
-				write!(f, "{}", c)?;
+				write!(f, "{c}")?;
 			}
 			writeln!(f)?;
 		}
@@ -115,7 +115,7 @@ impl FromStr for Area {
 			let mut path = path.into_iter();
 			let Some(mut prev) = path.next() else {
 				continue;
-			} ;
+			};
 			for step in path {
 				let mut xs = prev.0..=step.0;
 				let mut ys = prev.1..=step.1;
@@ -168,6 +168,7 @@ enum MoveResult {
 }
 
 impl Area {
+	#[allow(clippy::cast_possible_truncation)]
 	fn height(&self) -> Coord {
 		self.data.len() as Coord / self.width
 	}
@@ -221,7 +222,7 @@ impl Area {
 				pixel_size * self.width as u32,
 				pixel_size * self.height() as u32,
 				image::imageops::FilterType::Nearest,
-			)
+			);
 		}
 		img
 	}
@@ -229,7 +230,7 @@ impl Area {
 
 impl Day14 {
 	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
-		let input = self.input.as_cow_str();
+		let input = self.input.as_cow_str()?;
 		let input = input.as_ref();
 
 		let mut area: Area = input.parse()?;
@@ -246,10 +247,10 @@ impl Day14 {
 			gif.set_repeat(image::codecs::gif::Repeat::Infinite)?;
 			loop {
 				let done = area.spawn_and_move_sand();
-				let delay = if done != MoveResult::HitNormal {
-					1000
-				} else {
+				let delay = if done == MoveResult::HitNormal {
 					50
+				} else {
+					1000
 				};
 				gif.encode_frame(image::Frame::from_parts(
 					area.render_image(mult as u32),
@@ -295,8 +296,8 @@ impl Day14 {
 			count2 += 1; // For the last dropped sand
 		}
 
-		println!("Step 1: {}", count);
-		println!("Step 2: {}", count2);
+		println!("Step 1: {count}");
+		println!("Step 2: {count2}");
 
 		Ok(())
 	}

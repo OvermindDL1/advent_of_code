@@ -91,18 +91,19 @@ impl FromStr for Sensors {
 }
 
 impl Display for Sensors {
+	#[allow(clippy::cast_sign_loss)]
 	fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
 		let mut height_max = self.bounds.0.start().abs().max(self.bounds.0.end().abs());
 		let mut height_digits = 0;
 		while height_max > 0 {
 			height_digits += 1;
-			height_max = height_max / 10;
+			height_max /= 10;
 		}
 		let mut width_max = self.bounds.1.start().abs().max(self.bounds.1.end().abs());
 		let mut width_digits = 0;
 		while width_max > 0 {
 			width_digits += 1;
-			width_max = width_max / 10;
+			width_max /= 10;
 		}
 		for _ in 0..=width_digits {
 			write!(f, " ")?;
@@ -140,7 +141,7 @@ impl Display for Sensors {
 					Data::Beacon => 'B',
 					Data::Sensor => 'S',
 				};
-				write!(f, "{}", c)
+				write!(f, "{c}")
 			})?;
 			writeln!(f)?;
 		}
@@ -184,7 +185,7 @@ impl Sensors {
 					}
 				}
 				if cache.is_none() {
-					cache = line_cache.iter().find(|s| s.in_known_range(x, y)).cloned();
+					cache = line_cache.iter().find(|s| s.in_known_range(x, y)).copied();
 				}
 				let cell = if let Some(s) = cache {
 					if s.beacon == (x, y) {
@@ -281,14 +282,14 @@ enum Data {
 }
 
 impl Data {
-	fn is_known_and_not_beacon(&self) -> bool {
-		self != &Data::Unknown && self != &Data::Beacon
+	fn is_known_and_not_beacon(self) -> bool {
+		self != Data::Unknown && self != Data::Beacon
 	}
 }
 
 impl Day15 {
 	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
-		let input = self.input.as_cow_str();
+		let input = self.input.as_cow_str()?;
 		let input = input.as_ref();
 
 		let sensors: Sensors = input.parse()?;
@@ -297,16 +298,16 @@ impl Day15 {
 		let score1 = sensors.fold_cells::<_, anyhow::Error>(
 			0,
 			sensors.bounds.0.clone(),
-			2000000..=2000000,
+			2_000_000..=2_000_000,
 			|acc, _x, _y, cell| Ok(acc + i32::from(cell.is_known_and_not_beacon())),
 		)?;
 
-		println!("Step 1: {}", score1);
+		println!("Step 1: {score1}");
 
 		let coords2 = sensors
-			.find_empty(0..=4000000, 0..=4000000)
+			.find_empty(0..=4_000_000, 0..=4_000_000)
 			.context("didn't find an unknown spot")?;
-		println!("Step 2: {}", coords2.0 * 4000000 + coords2.1);
+		println!("Step 2: {}", coords2.0 * 4_000_000 + coords2.1);
 
 		Ok(())
 	}

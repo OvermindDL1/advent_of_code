@@ -38,7 +38,7 @@ impl Display for Monkey {
 	fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
 		write!(f, "Monkey {}: ", self.id)?;
 		for w in &self.worries {
-			write!(f, "{} ", w)?;
+			write!(f, "{w} ")?;
 		}
 		Ok(())
 	}
@@ -47,6 +47,7 @@ impl Display for Monkey {
 impl FromStr for Monkey {
 	type Err = anyhow::Error;
 
+	#[allow(clippy::too_many_lines)]
 	fn from_str(s: &str) -> Result<Self, Self::Err> {
 		let (monkey_id_str, rest) = s
 			.trim()
@@ -68,9 +69,13 @@ impl FromStr for Monkey {
 			.trim()
 			.split_once('\n')
 			.context("invalid monkey items line")?;
-		let ("Starting items", worries_str) = worries_str.trim().split_once(": ").context("invalid monkey items definition line")? else {
-				bail!("invalid monkey items definition line");
-			};
+		let ("Starting items", worries_str) = worries_str
+			.trim()
+			.split_once(": ")
+			.context("invalid monkey items definition line")?
+		else {
+			bail!("invalid monkey items definition line");
+		};
 		let worries: VecDeque<Worry> = worries_str
 			.trim()
 			.split(", ")
@@ -82,12 +87,17 @@ impl FromStr for Monkey {
 			.trim()
 			.split_once('\n')
 			.context("invalid monkey operation line")?;
-		let ("Operation", operation_str) = operation_str.trim().split_once(": ").context("invalid monkey operation definition line")? else {
-				bail!("invalid monkey operation definition line");
-			};
-		let ("new = old ", operation_str) = operation_str.trim().split_at("new = old ".len()) else {
-				bail!("invalid monkey operation action");
-			};
+		let ("Operation", operation_str) = operation_str
+			.trim()
+			.split_once(": ")
+			.context("invalid monkey operation definition line")?
+		else {
+			bail!("invalid monkey operation definition line");
+		};
+		let ("new = old ", operation_str) = operation_str.trim().split_at("new = old ".len())
+		else {
+			bail!("invalid monkey operation action");
+		};
 		let operation = match operation_str.trim().split_at(1) {
 			("+", val) => Op::Add(
 				val.trim()
@@ -107,9 +117,11 @@ impl FromStr for Monkey {
 			.trim()
 			.split_once('\n')
 			.context("invalid monkey test line")?;
-		let ("Test: divisible by ", test_div_str) = test_div_str.trim().split_at("Test: divisible by ".len()) else {
-				bail!("invalid monkey test definition line: {test_div_str}");
-			};
+		let ("Test: divisible by ", test_div_str) =
+			test_div_str.trim().split_at("Test: divisible by ".len())
+		else {
+			bail!("invalid monkey test definition line: {test_div_str}");
+		};
 		let test_div = test_div_str
 			.trim()
 			.parse()
@@ -119,12 +131,18 @@ impl FromStr for Monkey {
 			.trim()
 			.split_once('\n')
 			.context("invalid monkey if * throw to line")?;
-		let ("If true: throw to monkey ", if_true_throw_to_str) = if_true_throw_to_str.trim().split_at("If true: throw to monkey ".len()) else {
-				bail!("invalid monkey if true throw to definition line: {if_true_throw_to_str}");
-			};
-		let ("If false: throw to monkey ", if_false_throw_to_str) = if_false_throw_to.trim().split_at("If false: throw to monkey ".len()) else {
-				bail!("invalid monkey if false throw to definition line: {if_false_throw_to}");
-			};
+		let ("If true: throw to monkey ", if_true_throw_to_str) = if_true_throw_to_str
+			.trim()
+			.split_at("If true: throw to monkey ".len())
+		else {
+			bail!("invalid monkey if true throw to definition line: {if_true_throw_to_str}");
+		};
+		let ("If false: throw to monkey ", if_false_throw_to_str) = if_false_throw_to
+			.trim()
+			.split_at("If false: throw to monkey ".len())
+		else {
+			bail!("invalid monkey if false throw to definition line: {if_false_throw_to}");
+		};
 		let if_true_throw_to = if_true_throw_to_str
 			.trim()
 			.parse()
@@ -178,17 +196,20 @@ impl Day11 {
 		}
 	}
 
+	#[allow(clippy::too_many_lines)]
 	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
-		let input = self.input.as_cow_str();
+		let input = self.input.as_cow_str()?;
 		let input = input.as_ref();
 
 		let mut monkeys: Vec<Monkey> = input
 			.split("\n\n")
 			.map(Monkey::from_str)
 			.collect::<anyhow::Result<_>>()?;
-		monkeys.iter().enumerate().for_each(|(i, m)| {
-			assert_eq!(i, m.id as usize);
-		});
+		for (i, m) in monkeys.iter().enumerate() {
+			if i != m.id as usize {
+				bail!("invalid monkey ID: {i} != {}", m.id);
+			}
+		}
 		let mut monkeys2 = monkeys.clone();
 
 		let test_mod = monkeys.iter().map(|m| m.test_div).product::<Worry>();
@@ -230,8 +251,8 @@ impl Day11 {
 		let (_worst, best) = monkeys2.split_at(monkeys.len() - 2);
 		let score2 = best.iter().map(|m| m.inspections).product::<u64>();
 
-		println!("Step 1: {}", score1);
-		println!("Step 2: {}", score2);
+		println!("Step 1: {score1}");
+		println!("Step 2: {score2}");
 
 		Ok(())
 	}

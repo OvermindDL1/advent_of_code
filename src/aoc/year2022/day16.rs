@@ -5,6 +5,7 @@ use ahash::{HashMap, HashMapExt};
 use anyhow::{bail, Context};
 use clap::Parser;
 use nalgebra::DMatrix;
+use petgraph::dot::Dot;
 use petgraph::graph::{DiGraph, NodeIndex};
 use std::cmp::Ordering;
 use std::collections::VecDeque;
@@ -34,7 +35,7 @@ struct Valve {
 
 impl Day16 {
 	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
-		let input = self.input.as_cow_str();
+		let input = self.input.as_cow_str()?;
 		let input = input.as_ref();
 
 		let mut nodes = HashMap::new();
@@ -93,25 +94,23 @@ impl Day16 {
 		}
 
 		let mut paths = DMatrix::zeros(wanted_nodes.len(), wanted_nodes.len());
-		for (i0, (n0, _)) in wanted_nodes.iter().cloned().enumerate() {
-			for (i1, (n1, _)) in wanted_nodes.iter().cloned().enumerate() {
+		for (i0, (n0, _)) in wanted_nodes.iter().copied().enumerate() {
+			for (i1, (n1, _)) in wanted_nodes.iter().copied().enumerate() {
 				if i0 == i1 {
 					continue;
 				}
-				let Some((weight, _path)) = petgraph::algo::astar(
-					&graph,
-					n0,
-					|n| n == n1,
-					|_e| 1,
-					|_n| 1u8,
-				) else {continue};
+				let Some((weight, _path)) =
+					petgraph::algo::astar(&graph, n0, |n| n == n1, |_e| 1, |_n| 1u8)
+				else {
+					continue;
+				};
 				paths[(i0, i1)] = weight;
 			}
 		}
 
 		std::fs::write(
 			"2022-16.dot",
-			format!("{:?}", petgraph::dot::Dot::with_config(&graph, &[])),
+			format!("{:?}", Dot::with_config(&graph, &[])),
 		)?;
 		// dbg!(&graph);
 		// for xs in paths.row_iter() {
@@ -132,7 +131,7 @@ impl Day16 {
 			(0, 0),
 			CurState::Neither,
 			&mut remaining,
-		);
+		)?;
 		// for i in 0..wanted_nodes.len() {
 		// 	print!("{i:<2} ");
 		// }
@@ -231,8 +230,8 @@ impl Day16 {
 		// }
 		// println!();
 
-		println!("Step 1: {}", score1);
-		println!("Step 2: {}", score2);
+		println!("Step 1: {score1}");
+		println!("Step 2: {score2}");
 
 		Ok(())
 	}
@@ -297,6 +296,7 @@ impl Display for CurState {
 
 const MAX_DUAL_TIME: u8 = 26;
 
+#[allow(clippy::needless_pass_by_value, clippy::too_many_lines)]
 fn find_best_score_in_time_dual(
 	travel_times: &DMatrix<u8>,
 	rates: &Vec<(NodeIndex, usize)>,
@@ -305,13 +305,9 @@ fn find_best_score_in_time_dual(
 	prior: (usize, usize),
 	cur: CurState,
 	remaining: &mut VecDeque<usize>,
-) -> usize {
-	// println!(
-	// 	"{}{cur} {time} {rate} {remaining:?}",
-	// 	" ".repeat(20 - remaining.len()),
-	// );
+) -> anyhow::Result<usize> {
 	if time > MAX_DUAL_TIME {
-		panic!()
+		bail!("too much time spent {time} > {MAX_DUAL_TIME}");
 	}
 	let mut best_score = (MAX_DUAL_TIME - time) as usize * rate;
 	match cur {
@@ -328,7 +324,7 @@ fn find_best_score_in_time_dual(
 					(prior.0, 0),
 					CurState::Both((t0, cur0), (30, 0)),
 					remaining,
-				);
+				)?;
 				best_score = best_score.max(score);
 				for _ in 0..(remaining.len()) {
 					let cur1 = remaining.pop_front().unwrap();
@@ -341,7 +337,7 @@ fn find_best_score_in_time_dual(
 						(prior.0, prior.1),
 						CurState::Both((t0, cur0), (t1, cur1)),
 						remaining,
-					);
+					)?;
 					best_score = best_score.max(score);
 					remaining.push_back(cur1);
 				}
@@ -359,7 +355,7 @@ fn find_best_score_in_time_dual(
 					(0, prior.1),
 					CurState::Both((30, 0), (t1, cur1)),
 					remaining,
-				);
+				)?;
 				best_score = best_score.max(score);
 				remaining.push_back(cur1);
 			}
@@ -376,7 +372,7 @@ fn find_best_score_in_time_dual(
 					(prior.0, prior.1),
 					CurState::Both((t0, cur0), (t1, cur1)),
 					remaining,
-				);
+				)?;
 				best_score = best_score.max(score);
 				remaining.push_back(cur1);
 			}
@@ -393,7 +389,7 @@ fn find_best_score_in_time_dual(
 					(prior.0, prior.1),
 					CurState::Both((t0, cur0), (t1, cur1)),
 					remaining,
-				);
+				)?;
 				best_score = best_score.max(score);
 				remaining.push_back(cur0);
 			}
@@ -412,7 +408,7 @@ fn find_best_score_in_time_dual(
 							(cur0, prior.1),
 							CurState::Right(t1 - t0, cur1),
 							remaining,
-						)
+						)?
 				};
 				best_score = best_score.max(score);
 			}
@@ -429,7 +425,7 @@ fn find_best_score_in_time_dual(
 							(cur0, cur1),
 							CurState::Neither,
 							remaining,
-						)
+						)?
 				};
 				best_score = best_score.max(score);
 			}
@@ -446,12 +442,11 @@ fn find_best_score_in_time_dual(
 							(prior.0, cur1),
 							CurState::Left(t0 - t1, cur0),
 							remaining,
-						)
+						)?
 				};
 				best_score = best_score.max(score);
 			}
 		},
 	}
-	// println!("{}->{best_score}", " ".repeat(20 - remaining.len()),);
-	best_score
+	Ok(best_score)
 }

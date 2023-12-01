@@ -21,7 +21,7 @@ impl Day3 {
 	}
 
 	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
-		let input = self.input.as_cow_u8();
+		let input = self.input.as_cow_u8()?;
 		let lines: Vec<_> = input
 			.as_ref()
 			.split(|c| *c == b'\n')
@@ -29,12 +29,12 @@ impl Day3 {
 			.collect();
 
 		let mut score1 = 0;
-		for line in lines.iter() {
+		for line in &lines {
 			let (c0, c1) = line.split_at(line.len() >> 1);
 			let found = c0
 				.iter()
 				.find(|i| c1.contains(i))
-				.cloned()
+				.copied()
 				.context("no duplicate found")?;
 			let priority = Self::priority_of(found)? as usize;
 			score1 += priority;
@@ -44,15 +44,15 @@ impl Day3 {
 		for (l0, l1, l2) in lines.iter().tuples() {
 			let badge = l0
 				.iter()
-				.cloned()
+				.copied()
 				.find(|c| l1.contains(c) && l2.contains(c))
 				.context("no badge found across all 3")?;
 			let priority = Self::priority_of(badge)? as usize;
 			score2 += priority;
 		}
 
-		println!("Step 1: {}", score1);
-		println!("Step 2: {}", score2);
+		println!("Step 1: {score1}");
+		println!("Step 2: {score2}");
 		Ok(())
 	}
 }

@@ -1,3 +1,10 @@
+#![warn(clippy::pedantic)]
+#![allow(
+	clippy::wildcard_imports,
+	clippy::missing_errors_doc,
+	clippy::enum_glob_use,
+	clippy::cast_lossless
+)]
 pub mod aoc;
 
 use clap::Parser;
@@ -20,14 +27,7 @@ pub struct AocApp {
 impl AocApp {
 	pub fn run(&self) -> anyhow::Result<()> {
 		match &self.command {
-			AocAppCommand::Run(aoc) => {
-				// let start = Instant::now();
-				let res = aoc.run(self);
-				// if self.verbose >= 1 {
-				// 	println!("_Total Program Time Taken: {:?}_", start.elapsed());
-				// }
-				res
-			}
+			AocAppCommand::Run(aoc) => aoc.run(self),
 			AocAppCommand::RunAll => {
 				println!("# OvermindDL1's Advent Of Code");
 				let start = Instant::now();

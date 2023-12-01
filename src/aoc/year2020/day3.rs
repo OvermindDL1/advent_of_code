@@ -1,5 +1,6 @@
 use crate::aoc::helpers::*;
 use crate::AocApp;
+use anyhow::bail;
 use clap::Parser;
 
 #[derive(Debug, Parser)]
@@ -11,14 +12,15 @@ pub struct Day3 {
 impl Day3 {
 	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
 		let map = map_trimmed_nonempty_lines_of_file(&self.input, |line| {
-			Ok(line
-				.chars()
-				.map(|c| match c {
-					'.' => false,
-					'#' => true,
-					_ => panic!("Unexpected character {}", c),
+			line.chars()
+				.map(|c| {
+					Ok(match c {
+						'.' => false,
+						'#' => true,
+						_ => bail!("Unexpected character {c}"),
+					})
 				})
-				.collect::<Vec<_>>())
+				.collect::<anyhow::Result<Vec<_>>>()
 		})?;
 
 		println!(
@@ -38,7 +40,7 @@ impl Day3 {
 				.filter(|tree| tree.1[((tree.0 / down) * right) % tree.1.len()])
 				.count();
 		}
-		println!("Step 2: {}", answer);
+		println!("Step 2: {answer}");
 
 		Ok(())
 	}

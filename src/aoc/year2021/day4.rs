@@ -1,6 +1,6 @@
 use crate::aoc::helpers::*;
 use crate::AocApp;
-use anyhow::Context;
+use anyhow::{bail, Context};
 use clap::Parser;
 
 #[derive(Debug, Parser)]
@@ -23,10 +23,9 @@ impl Default for CardCell {
 }
 
 impl CardCell {
-	fn value(&self) -> u8 {
+	fn value(self) -> u8 {
 		match self {
-			CardCell::Unmarked(v) => *v,
-			CardCell::Marked(v) => *v,
+			CardCell::Marked(v) | CardCell::Unmarked(v) => v,
 		}
 	}
 
@@ -34,14 +33,14 @@ impl CardCell {
 		*self = CardCell::Marked(self.value());
 	}
 
-	fn is_marked(&self) -> bool {
+	fn is_marked(self) -> bool {
 		matches!(self, CardCell::Marked(_))
 	}
 
-	fn get_if_unmarked(&self) -> Option<u8> {
+	fn get_if_unmarked(self) -> Option<u8> {
 		match self {
-			CardCell::Unmarked(v) => Some(*v),
-			_ => None,
+			CardCell::Unmarked(v) => Some(v),
+			CardCell::Marked(_) => None,
 		}
 	}
 }
@@ -55,7 +54,7 @@ impl Card {
 	}
 
 	fn call(&mut self, call: u8) -> bool {
-		for cell in self.0.iter_mut() {
+		for cell in &mut self.0 {
 			if cell.value() == call {
 				cell.mark();
 				return self.is_complete();
@@ -76,10 +75,11 @@ impl Card {
 	fn solution(&self, winning_num: u8) -> u32 {
 		self.0
 			.iter()
+			.copied()
 			.filter_map(CardCell::get_if_unmarked)
-			.map(|n| n as u32)
+			.map(u32::from)
 			.sum::<u32>()
-			* winning_num as u32
+			* u32::from(winning_num)
 	}
 }
 
@@ -87,7 +87,7 @@ impl Day4 {
 	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
 		let mut calls = Vec::with_capacity(1024);
 		let mut cards = Vec::with_capacity(128);
-		let mut card: Card = Default::default();
+		let mut card: Card = Card::default();
 		let mut card_line = 0;
 		process_trimmed_nonempty_lines_of_file(&self.input, |line| {
 			if calls.is_empty() {
@@ -111,12 +111,15 @@ impl Day4 {
 				if card_line == 5 {
 					cards.push(card);
 					card_line = 0;
-					card = Default::default();
+					card = Card::default();
 				}
 			}
 			Ok(())
 		})?;
-		assert_eq!(card_line, 0, "card lines not multiple of 5");
+
+		if card_line == 0 {
+			bail!("card lines not multiple of 5");
+		}
 
 		let mut winning_nums = Vec::with_capacity(cards.len());
 		{

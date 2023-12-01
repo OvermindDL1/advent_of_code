@@ -1,6 +1,8 @@
+#![allow(clippy::similar_names)]
+
 use crate::aoc::helpers::*;
 use crate::AocApp;
-use anyhow::Context;
+use anyhow::{bail, Context};
 use clap::Parser;
 use petgraph::algo::astar;
 use petgraph::graph::DiGraph;
@@ -22,7 +24,7 @@ fn idx(x: usize, y: usize, width: usize) -> usize {
 
 impl Day12 {
 	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
-		let input = self.input.as_cow_str();
+		let input = self.input.as_cow_str()?;
 		let input = input.as_ref();
 
 		let width = input.lines().next().context("input is empty")?.trim().len();
@@ -44,32 +46,39 @@ impl Day12 {
 			.as_bytes()
 			.iter()
 			.copied()
-			.filter(|&c| (b'a'..=b'z').contains(&c) || c == b'S' || c == b'E')
-			.map(|c| match c {
-				b'S' => {
-					#[allow(clippy::eq_op)]
-					let weight = b'a' - b'a';
-					let node = gmap.add_node(weight);
-					start = Some(node);
-					(node, weight)
-				}
-				b'E' => {
-					let weight = b'z' - b'a';
-					let node = gmap.add_node(weight);
-					end = Some(node);
-					(node, weight)
-				}
-				b'a'..=b'z' => (gmap.add_node(c - b'a'), c - b'a'),
-				unhandled => panic!("unhandled char: {unhandled}"),
+			.filter(|&c| c.is_ascii_lowercase() || c == b'S' || c == b'E')
+			.map(|c| {
+				Ok(match c {
+					b'S' => {
+						#[allow(clippy::eq_op)]
+						let weight = b'a' - b'a';
+						let node = gmap.add_node(weight);
+						start = Some(node);
+						(node, weight)
+					}
+					b'E' => {
+						let weight = b'z' - b'a';
+						let node = gmap.add_node(weight);
+						end = Some(node);
+						(node, weight)
+					}
+					b'a'..=b'z' => (gmap.add_node(c - b'a'), c - b'a'),
+					unhandled => bail!("unhandled char: {unhandled}"),
+				})
 			})
-			.collect();
+			.collect::<anyhow::Result<_>>()?;
 
 		// Must have found start and end
 		let start = start.context("start did not exist in the input")?;
 		let end = end.context("end did not exist in the input")?;
 
 		// Edges
-		assert_eq!(width * height, mmap.len());
+		if width * height != mmap.len() {
+			bail!(
+				"width * height != mmap.len() : {width} * {height} != {}",
+				mmap.len()
+			);
+		}
 		for x in 0..width {
 			for y in 0..height {
 				let this = mmap[idx(x, y, width)];
@@ -124,11 +133,11 @@ impl Day12 {
 			|e| if *e.weight() { 1000 } else { 1 },
 			|n| gmap[n] as u64,
 		)
-		.context("no backpath found")?;
+		.context("no back path found")?;
 		// dbg!(total_cost2, _path2);
 
-		println!("Step 1: {}", total_cost1);
-		println!("Step 2: {}", total_cost2);
+		println!("Step 1: {total_cost1}");
+		println!("Step 2: {total_cost2}");
 
 		Ok(())
 	}

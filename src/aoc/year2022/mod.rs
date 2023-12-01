@@ -20,7 +20,7 @@ use clap::Parser;
 
 #[derive(Debug, Parser)]
 pub enum Year2022 {
-	/// Run all the Advent of Code 2021 days
+	/// Run all the Advent of Code 2022 days
 	RunAll,
 	/// Advent of Code 2022, Day 1 - Calorie Counting
 	#[clap(name = "1")]

@@ -121,10 +121,11 @@ impl Data {
 
 impl Day13 {
 	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
-		let input = self.input.as_cow_str();
+		let input = self.input.as_cow_str()?;
 		let input = input.as_ref();
 
-		let data = Data::parse_list_of_data_pairs(input).expect("parse failed");
+		let data = Data::parse_list_of_data_pairs(input)
+			.map_err(|e| anyhow::anyhow!("parse error: {e:?}"))?;
 
 		// for (a, b) in &data {
 		// 	println!("{a:?}");
@@ -141,10 +142,10 @@ impl Day13 {
 
 		let dividers = [
 			Data::parse_data("[[2]]")
-				.expect("parse failed of static data")
+				.map_err(|e| anyhow::anyhow!("parse error: {e:?}"))?
 				.1,
 			Data::parse_data("[[6]]")
-				.expect("parse failed of static data")
+				.map_err(|e| anyhow::anyhow!("parse error: {e:?}"))?
 				.1,
 		];
 		let mut data: Vec<Data> = data.into_iter().flat_map(|(a, b)| [a, b]).collect();
@@ -159,8 +160,8 @@ impl Day13 {
 			.map(|(i, _d)| i + 1)
 			.product::<usize>();
 
-		println!("Step 1: {}", score1);
-		println!("Step 2: {}", score2);
+		println!("Step 1: {score1}");
+		println!("Step 2: {score2}");
 
 		Ok(())
 	}

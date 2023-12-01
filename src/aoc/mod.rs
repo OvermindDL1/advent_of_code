@@ -7,10 +7,12 @@ pub mod year2019;
 pub mod year2020;
 pub mod year2021;
 pub mod year2022;
+pub mod year2023;
 
 use crate::AocApp;
 use clap::Parser;
 
+#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Parser)]
 pub enum AocYear {
 	/// Advent of Code 2015
@@ -61,6 +63,12 @@ pub enum AocYear {
 		#[clap(subcommand)]
 		day: year2022::Year2022,
 	},
+	/// Advent of Code 2022
+	#[clap(name = "2023")]
+	Year2023 {
+		#[clap(subcommand)]
+		day: year2023::Year2023,
+	},
 }
 
 impl AocYear {
@@ -74,6 +82,7 @@ impl AocYear {
 			AocYear::Year2020 { day } => day.run(app),
 			AocYear::Year2021 { day } => day.run(app),
 			AocYear::Year2022 { day } => day.run(app),
+			AocYear::Year2023 { day } => day.run(app),
 		}
 	}
 
@@ -86,6 +95,7 @@ impl AocYear {
 		year2020::Year2020::run_all(app)?;
 		year2021::Year2021::run_all(app)?;
 		year2022::Year2022::run_all(app)?;
+		year2023::Year2023::run_all(app)?;
 		Ok(())
 	}
 }

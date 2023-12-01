@@ -1,3 +1,5 @@
+#![allow(clippy::similar_names)]
+
 use crate::aoc::helpers::*;
 use crate::AocApp;
 use anyhow::Context;
@@ -13,22 +15,20 @@ pub struct Day7 {
 
 impl Day7 {
 	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
-		let input = self.input.as_cow_str();
+		let input = self.input.as_cow_str()?;
 		let input = input.as_ref().trim();
 
 		let mut size_stack = Vec::new();
 		let mut sizes = Vec::new();
 		let mut cwd = PathBuf::new();
 		let mut score1 = 0;
-		for io in input.split('$').map(|l| l.trim()).filter(|l| !l.is_empty()) {
+		for io in input.split('$').map(str::trim).filter(|l| !l.is_empty()) {
 			let (cmd, response) = io
 				.split_once('\n')
-				.map(|(cmd, response)| (cmd.trim(), response.trim()))
-				.unwrap_or((io, ""));
+				.map_or((io, ""), |(cmd, response)| (cmd.trim(), response.trim()));
 			match cmd
 				.split_once(' ')
-				.map(|(cmd, args)| (cmd.trim(), args.trim()))
-				.unwrap_or((cmd, ""))
+				.map_or((cmd, ""), |(cmd, args)| (cmd.trim(), args.trim()))
 			{
 				("cd", "/") if response.is_empty() => {
 					cwd.clear();
@@ -39,7 +39,7 @@ impl Day7 {
 					cwd.pop();
 					let size = size_stack.pop().context("size stack underflow")?;
 					sizes.push(size);
-					if size < 100000 {
+					if size < 100_000 {
 						score1 += size;
 					}
 					if let Some(s) = size_stack.last_mut() {
@@ -65,7 +65,7 @@ impl Day7 {
 					}
 				}
 				(cmd, args) => {
-					panic!("unhandled command `{cmd} {args}` with response of: \n{response}")
+					anyhow::bail!("unhandled command `{cmd} {args}` with response of: \n{response}")
 				}
 			}
 		}
@@ -77,18 +77,18 @@ impl Day7 {
 
 		sizes.sort_unstable();
 		let largest = *sizes.last().context("no sizes")?;
-		let free = 70000000usize
+		let free = 70_000_000_usize
 			.checked_sub(largest)
 			.context("somehow storing more than there is of free space")?;
-		let need = 30000000usize.saturating_sub(free);
+		let need = 30_000_000_usize.saturating_sub(free);
 		let idx = sizes.binary_search(&need).map_or_else(|i| i, |i| i);
 		let score2 = sizes
 			.get(idx)
 			.copied()
 			.context("no directory is large enough to free enough space")?;
 
-		println!("Step 1: {}", score1);
-		println!("Step 2: {}", score2);
+		println!("Step 1: {score1}");
+		println!("Step 2: {score2}");
 		Ok(())
 	}
 }

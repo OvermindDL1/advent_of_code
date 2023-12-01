@@ -71,7 +71,7 @@ impl Passport {
 		if !self.hcl.starts_with('#') || self.hcl.len() != 7 {
 			return false;
 		}
-		if !self.hcl.chars().skip(1).all(|c| c.is_digit(16)) {
+		if !self.hcl.chars().skip(1).all(|c| c.is_ascii_hexdigit()) {
 			return false;
 		}
 		match self.ecl.as_str() {
@@ -81,7 +81,7 @@ impl Passport {
 		if self.pid.len() != 9 {
 			return false;
 		}
-		self.pid.chars().all(|c| c.is_digit(10))
+		self.pid.chars().all(|c| c.is_ascii_digit())
 	}
 }
 

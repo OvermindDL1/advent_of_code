@@ -30,7 +30,7 @@ impl Day4 {
 		})?;
 
 		let mut score1 = 0;
-		for [left, right] in assignments.iter() {
+		for [left, right] in &assignments {
 			if left.start() >= right.start() && left.end() <= right.end()
 				|| right.start() >= left.start() && right.end() <= left.end()
 			{
@@ -39,7 +39,7 @@ impl Day4 {
 		}
 
 		let mut score2 = 0;
-		for [left, right] in assignments.iter() {
+		for [left, right] in &assignments {
 			if left.contains(right.start())
 				|| left.contains(right.end())
 				|| right.contains(left.start())
@@ -49,8 +49,8 @@ impl Day4 {
 			}
 		}
 
-		println!("Step 1: {}", score1);
-		println!("Step 2: {}", score2);
+		println!("Step 1: {score1}");
+		println!("Step 2: {score2}");
 		Ok(())
 	}
 }

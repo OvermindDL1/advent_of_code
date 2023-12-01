@@ -27,8 +27,8 @@ impl Day2 {
 			Ok(())
 		})?;
 
-		println!("Step 1: {}", valid_count_1);
-		println!("Step 2: {}", valid_count_2);
+		println!("Step 1: {valid_count_1}");
+		println!("Step 2: {valid_count_2}");
 
 		Ok(())
 	}
@@ -61,13 +61,13 @@ impl Day2 {
 		let low = low - 1;
 		let high = high - 1;
 		let mut chars = password.chars().enumerate();
-		while let Some((i, cc)) = chars.next() {
+		for (i, cc) in chars.by_ref() {
 			if i == low {
 				valid_2 = cc == c;
 				break;
 			}
 		}
-		while let Some((i, cc)) = chars.next() {
+		for (i, cc) in chars {
 			if i == high {
 				return Ok((valid_1, valid_2 != (cc == c)));
 			}

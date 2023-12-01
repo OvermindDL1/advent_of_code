@@ -39,7 +39,7 @@ impl Day6 {
 			for num in line.split(',') {
 				let num: usize = num
 					.parse()
-					.with_context(|| format!("invalid number: {}", num))?;
+					.with_context(|| format!("invalid number: {num}"))?;
 				if num >= counts.0.len() {
 					anyhow::bail!(
 						"number of lifetime is too large (max {}): {}",

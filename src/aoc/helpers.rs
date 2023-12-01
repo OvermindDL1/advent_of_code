@@ -1,5 +1,5 @@
 use crate::Inputs;
-use anyhow::{bail, Context};
+use anyhow::Context;
 use std::borrow::Cow;
 use std::ffi::OsStr;
 use std::fmt::{Display, Formatter};
@@ -17,16 +17,16 @@ pub enum DataFrom {
 }
 
 impl DataFrom {
-	pub fn as_cow_str(&self) -> Cow<str> {
-		match self {
+	pub fn as_cow_str(&self) -> anyhow::Result<Cow<str>> {
+		Ok(match self {
 			DataFrom::Internal { year, day } => {
 				let path = format!("{year}/day{day}.input");
 				let data = Inputs::get(&path)
 					.with_context(|| format!("missing {}", &path))
-					.expect("invalid internal input year and/or day");
+					.context("invalid internal input year and/or day")?;
 				Cow::Owned(
 					String::from_utf8(data.data.as_ref().to_vec())
-						.expect("input must be valid utf-8"),
+						.context("input must be valid utf-8")?,
 				)
 			}
 			DataFrom::Static(data) => data.clone(),
@@ -34,25 +34,24 @@ impl DataFrom {
 				let mut data = Vec::default();
 				std::io::stdin()
 					.read_to_end(&mut data)
-					.expect("invalid read from stdin");
-				Cow::Owned(String::from_utf8(data).expect("input must be valid utf-8"))
+					.context("invalid read from stdin")?;
+				Cow::Owned(String::from_utf8(data).context("input must be valid utf-8")?)
 			}
 			DataFrom::FilePath(path) => {
 				let data = std::fs::read_to_string(path)
-					.with_context(|| format!("invalid read from path: {path:?}"))
-					.unwrap();
+					.with_context(|| format!("invalid read from path: {path:?}"))?;
 				Cow::Owned(data)
 			}
-		}
+		})
 	}
 
-	pub fn as_cow_u8(&self) -> Cow<[u8]> {
-		match self {
+	pub fn as_cow_u8(&self) -> anyhow::Result<Cow<[u8]>> {
+		Ok(match self {
 			DataFrom::Internal { year, day } => {
 				let path = format!("{year}/day{day}.input");
 				let data = Inputs::get(&path)
 					.with_context(|| format!("missing {}", &path))
-					.expect("invalid internal year day");
+					.context("invalid internal year day")?;
 				data.data
 			}
 			DataFrom::Static(data) => Cow::Borrowed(data.as_bytes()),
@@ -60,16 +59,15 @@ impl DataFrom {
 				let mut data = Vec::default();
 				std::io::stdin()
 					.read_to_end(&mut data)
-					.expect("invalid read from stdin");
+					.context("invalid read from stdin")?;
 				Cow::Owned(data)
 			}
 			DataFrom::FilePath(path) => {
 				let data = std::fs::read(path)
-					.with_context(|| format!("invalid read from path: {path:?}"))
-					.unwrap();
+					.with_context(|| format!("invalid read from path: {path:?}"))?;
 				Cow::Owned(data)
 			}
-		}
+		})
 	}
 }
 
@@ -83,7 +81,7 @@ impl Display for DataFrom {
 				if let Some(p) = filepath.to_str() {
 					f.write_str(p)
 				} else {
-					panic!("Internal filepaths should always be UTF-8: {filepath:?}")
+					panic!("Internal file paths should always be UTF-8: {filepath:?}")
 				}
 			}
 		}
@@ -96,18 +94,11 @@ impl FromStr for DataFrom {
 	fn from_str(s: &str) -> Result<Self, Self::Err> {
 		if s == "-" {
 			Ok(DataFrom::Stdin)
-		} else if s.starts_with(":") {
-			if let Some((year, day)) = s[1..].split_once(':') {
-				let year = year
-					.parse()
-					.with_context(|| "invalid :year:day order in: {s}")?;
-				let day = day
-					.parse()
-					.with_context(|| "invalid :year:day order in: {s}")?;
-				Ok(DataFrom::Internal { year, day })
-			} else {
-				bail!("invalid :year:day order in: {s}")
-			}
+		} else if let Some(s) = s.strip_prefix(':') {
+			let (year, day) = s.split_once(':').context("invalid :year:day order")?;
+			let year = year.parse().with_context(|| "invalid :year:day order")?;
+			let day = day.parse().with_context(|| "invalid :year:day order")?;
+			Ok(DataFrom::Internal { year, day })
 		} else if s.contains('\n') {
 			Ok(DataFrom::Static(Cow::Owned(s.to_string())))
 		} else {
@@ -135,20 +126,20 @@ pub fn process_lines_of_file(
 			let path = format!("{year}/day{day}.input");
 			let data = Inputs::get(&path).with_context(|| format!("missing {}", &path))?;
 			for line in std::str::from_utf8(data.data.as_ref())?.lines() {
-				cb(line).with_context(|| format!("Failed parsing line: {}", line))?;
+				cb(line).with_context(|| format!("Failed parsing line: {line}"))?;
 			}
 		}
 		DataFrom::Static(data) => {
 			for line in data.lines() {
-				cb(line).with_context(|| format!("Failed parsing line: {}", line))?;
+				cb(line).with_context(|| format!("Failed parsing line: {line}"))?;
 			}
 		}
 		DataFrom::Stdin => {
 			let stdin = std::io::stdin();
 			let mut handle = stdin.lock();
 			let mut line = String::with_capacity(16);
-			while handle.read_line(&mut line).unwrap() > 0 {
-				cb(&line).with_context(|| format!("Failed parsing line: {}", line))?;
+			while handle.read_line(&mut line)? > 0 {
+				cb(&line).with_context(|| format!("Failed parsing line: {line}"))?;
 				line.clear();
 			}
 		}
@@ -156,7 +147,7 @@ pub fn process_lines_of_file(
 			let mut data = BufReader::new(File::open(filepath)?);
 			let mut line = String::with_capacity(16);
 			while data.read_line(&mut line)? > 0 {
-				cb(&line).with_context(|| format!("Failed parsing line: {}", line))?;
+				cb(&line).with_context(|| format!("Failed parsing line: {line}"))?;
 				line.clear();
 			}
 		}
@@ -220,8 +211,11 @@ pub fn fold_trimmed_nonempty_lines_of_file<R, F: FnMut(R, &str) -> anyhow::Resul
 ) -> anyhow::Result<R> {
 	let mut acc = Some(acc);
 	process_trimmed_nonempty_lines_of_file(data, |line| {
-		acc = Some(cb(acc.take().unwrap(), line)?);
+		acc = Some(cb(
+			acc.take().context("failed to acquire accumulator value")?,
+			line,
+		)?);
 		Ok(())
 	})?;
-	Ok(acc.take().unwrap())
+	acc.take().context("failed to return accumulator value")
 }

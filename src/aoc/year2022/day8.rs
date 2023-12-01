@@ -25,11 +25,11 @@ impl From<&[u8]> for HeightMap {
 			input = &input[..input.len() - 1];
 		}
 		let width = input.iter().position(|&b| b == b'\n').unwrap();
-		let length = input.iter().filter(|&&b| b == b'\n').count() + 1;
+		let length = bytecount::count(input, b'\n') + 1;
 		let mut heights = vec![0; width * length].into_boxed_slice();
 		for (b, h) in input
 			.iter()
-			.filter(|i| (b'0'..=b'9').contains(i))
+			.filter(|i| i.is_ascii_digit())
 			.zip_eq(heights.iter_mut())
 		{
 			*h = b - b'0';
@@ -44,7 +44,7 @@ impl Display for HeightMap {
 			if i % self.width == 0 {
 				writeln!(f)?;
 			}
-			write!(f, "{}", height)?;
+			write!(f, "{height}")?;
 		}
 		Ok(())
 	}
@@ -78,6 +78,7 @@ impl HeightMap {
 		true
 	}
 
+	#[allow(clippy::range_plus_one)]
 	fn is_visible(&self, x: usize, y: usize) -> bool {
 		let height = self.get(x, y);
 		let (w, l) = self.size();
@@ -183,7 +184,7 @@ impl HeightMap {
 
 impl Day8 {
 	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
-		let input = self.input.as_cow_u8();
+		let input = self.input.as_cow_u8()?;
 		let input = input.as_ref();
 
 		let map = HeightMap::from(input);

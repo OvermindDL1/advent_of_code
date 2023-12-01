@@ -5,7 +5,7 @@ framework to make it easy to call it with the appropriate CLI arguments.
 
 ## Installation
 
-Have a proper full Rust installation (see [rustup.rs](rustup.rs) for more).
+Have a proper full Rust installation (see [rustup.rs](https://rustup.rs/) for more).
 Clone this repository such as via:
 
 ```zsh

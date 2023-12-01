@@ -22,18 +22,20 @@ impl Day3 {
 		})?;
 
 		let width: u32 = width.try_into()?;
-		let half_count = nums.len() as u32 / 2;
+		let half_count = u32::try_from(nums.len())? / 2;
 		let gamma = nums
 			.iter()
 			.copied()
 			.fold([0u32; u32::BITS as usize], |mut arr, n| {
-				(0..width).for_each(|i| arr[i as usize] += ((n & (1 << i)) != 0) as u32);
+				(0..width).for_each(|i| arr[i as usize] += u32::from((n & (1 << i)) != 0));
 				arr
 			})
 			.into_iter()
 			.take(width as usize)
 			.enumerate()
-			.fold(0, |n, (i, b)| n | (((b > half_count) as u32) << i as u32));
+			.try_fold(0, |n, (i, b)| -> anyhow::Result<u32> {
+				Ok(n | (u32::from(b > half_count) << u32::try_from(i)?))
+			})?;
 		let epsilon = gamma ^ ((1 << width) - 1);
 		println!("Step 1: {}", gamma * epsilon);
 
@@ -71,20 +73,18 @@ impl Day3 {
 				nums.iter()
 					.copied()
 					.find_position(|n| (n & (1 << idx)) == 0)
-					.map(|(i, _v)| i)
-					.unwrap_or(nums.len())
+					.map_or(nums.len(), |(i, _v)| i)
 			}
 			Ordering::Equal => {
-				nums.sort_by(|a, b| (a & 1 << idx).cmp(&(b & 1 << idx)));
+				nums.sort_by_key(|a| a & 1 << idx);
 				ones_count
 			}
 			Ordering::Greater => {
-				nums.sort_by(|a, b| (a & 1 << idx).cmp(&(b & 1 << idx)));
+				nums.sort_by_key(|a| a & 1 << idx);
 				nums.iter()
 					.copied()
 					.find_position(|n| (n & (1 << idx)) != 0)
-					.map(|(i, _v)| i)
-					.unwrap_or(nums.len())
+					.map_or(nums.len(), |(i, _v)| i)
 			}
 		};
 		nums.split_at_mut(mid)

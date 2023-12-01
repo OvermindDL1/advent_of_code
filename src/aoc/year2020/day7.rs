@@ -33,7 +33,7 @@ impl Day7 {
 						.trim_end_matches(" bag")
 						.split_once(' ')
 						.with_context(|| {
-							format!("invalid bag format in contains section: {}", can_contain)
+							format!("invalid bag format in contains section: {can_contain}")
 						})?;
 					Ok((count.parse::<usize>()?, SmolStr::new(can_contain)))
 				})

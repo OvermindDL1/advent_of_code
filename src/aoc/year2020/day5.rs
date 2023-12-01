@@ -45,8 +45,7 @@ impl FromStr for Seat {
 
 impl Day5 {
 	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
-		let mut seats =
-			map_trimmed_nonempty_lines_of_file(&self.input, |line| Ok(line.parse::<Seat>()?))?;
+		let mut seats: Vec<Seat> = map_trimmed_nonempty_lines_of_file(&self.input, str::parse)?;
 		seats.sort_unstable();
 		println!("Step 1: {}", seats.last().context("no seats")?.0);
 		println!(

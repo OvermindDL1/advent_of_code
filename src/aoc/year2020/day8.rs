@@ -51,12 +51,17 @@ impl Program {
 		}
 	}
 
+	#[allow(clippy::cast_sign_loss)]
 	fn run_once(&mut self) -> anyhow::Result<()> {
 		*self
 			.run_counts
 			.get_mut(self.ip as usize)
 			.context("ran out of instructions")? += 1;
-		match self.insns[self.ip as usize] {
+		match self
+			.insns
+			.get(self.ip as usize)
+			.context("ran out of instructions")?
+		{
 			Insns::Acc(arg) => {
 				self.acc += arg;
 				self.ip += 1;
@@ -71,10 +76,12 @@ impl Program {
 		Ok(())
 	}
 
+	#[allow(clippy::cast_possible_wrap)]
 	fn has_next_insn(&self) -> bool {
-		self.ip < self.insns.len() as i32
+		self.ip < i32::try_from(self.insns.len()).unwrap_or(0)
 	}
 
+	#[allow(clippy::cast_sign_loss)]
 	fn next_insn_run_count(&self) -> anyhow::Result<u32> {
 		Ok(*self
 			.run_counts
@@ -107,12 +114,12 @@ impl Program {
 	fn flip_jmp_nop_at(&mut self, ip: i32) -> anyhow::Result<bool> {
 		let insn = self
 			.insns
-			.get_mut(ip as usize)
+			.get_mut(usize::try_from(ip)?)
 			.context("ran out of instructions")?;
 		match *insn {
 			Insns::Jmp(arg) => *insn = Insns::Nop(arg),
 			Insns::Nop(arg) => *insn = Insns::Jmp(arg),
-			_ => return Ok(false),
+			Insns::Acc(_) => return Ok(false),
 		}
 		Ok(true)
 	}
@@ -125,21 +132,21 @@ impl Day8 {
 		})?;
 		let mut program = Program::new(insns);
 
-		if !program.reset_and_run_until_halt_or_insn_run_more_than(1)? {
-			println!("Step 1: {}", program.acc);
-		} else {
+		if program.reset_and_run_until_halt_or_insn_run_more_than(1)? {
 			anyhow::bail!("program terminated when it shouldn't have");
 		}
 
+		println!("Step 1: {}", program.acc);
+
 		for i in (0..program.insns.len()).rev() {
-			if !program.flip_jmp_nop_at(i as i32)? {
+			if !program.flip_jmp_nop_at(i32::try_from(i)?)? {
 				continue;
 			}
 			if program.reset_and_run_until_halt_or_insn_run_more_than(1)? {
 				println!("Step 2: {}", program.acc);
 				break;
 			}
-			program.flip_jmp_nop_at(i as i32)?;
+			program.flip_jmp_nop_at(i32::try_from(i)?)?;
 		}
 
 		Ok(())
