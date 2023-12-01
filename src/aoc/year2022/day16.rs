@@ -20,7 +20,7 @@ pub struct Day16 {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 struct ID([u8; 2]);
 impl Display for ID {
-	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+	fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
 		write!(f, "{}{}", self.0[0] as char, self.0[1] as char)
 	}
 }
