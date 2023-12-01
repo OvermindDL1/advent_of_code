@@ -26,7 +26,7 @@ impl Day1 {
 						.rev()
 						.find(u8::is_ascii_digit)
 						.ok_or_else(|| anyhow::anyhow!("No number found in line: {}", line))?;
-					std::str::from_utf8(&[first, last])?.parse::<u32>()?
+					(first - b'0') as u32 + (last - b'0') as u32
 				};
 
 				let step2 = {
