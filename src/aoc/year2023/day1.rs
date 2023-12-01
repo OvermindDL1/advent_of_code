@@ -26,7 +26,7 @@ impl Day1 {
 						.rev()
 						.find(u8::is_ascii_digit)
 						.ok_or_else(|| anyhow::anyhow!("No number found in line: {}", line))?;
-					(first - b'0') as u32 + (last - b'0') as u32
+					(first - b'0') as u32 * 10 + (last - b'0') as u32
 				};
 
 				let step2 = {
