@@ -9,7 +9,7 @@ use std::str::FromStr;
 #[derive(Debug, Parser)]
 pub struct Day5 {
 	/// The input file to use with the parseable seat data
-	#[clap(default_value_t = DataFrom::Internal {year: 2020, day: 5})]
+	#[clap(default_value_t = DataFrom::internal(2020, 5))]
 	pub input: DataFrom,
 }
 
@@ -44,26 +44,17 @@ impl FromStr for Seat {
 }
 
 impl Day5 {
-	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
+	pub fn run(&self, _app: &AocApp) -> anyhow::Result<(u16, u16)> {
 		let mut seats: Vec<Seat> = map_trimmed_nonempty_lines_of_file(&self.input, str::parse)?;
 		seats.sort_unstable();
-		println!("Step 1: {}", seats.last().context("no seats")?.0);
-		println!(
-			"Step 2: {}",
-			seats
-				.iter()
-				.map(|s| s.0)
-				.tuple_windows()
-				.find_map(|(a, b)| {
-					if b - a > 1 {
-						Some(a + 1)
-					} else {
-						None
-					}
-				})
-				.context("did not find a missing seat")?
-		);
+		let score1 = seats.last().context("no seats")?.0;
+		let score2 = seats
+			.iter()
+			.map(|s| s.0)
+			.tuple_windows()
+			.find_map(|(a, b)| if b - a > 1 { Some(a + 1) } else { None })
+			.context("did not find a missing seat")?;
 
-		Ok(())
+		Ok((score1, score2))
 	}
 }

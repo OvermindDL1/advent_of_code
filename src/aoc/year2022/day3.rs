@@ -7,7 +7,7 @@ use itertools::Itertools;
 #[derive(Debug, Parser)]
 pub struct Day3 {
 	/// The input file of "inventory"
-	#[clap(default_value_t = DataFrom::Internal {year: 2022, day: 3})]
+	#[clap(default_value_t = DataFrom::internal(2022, 3))]
 	pub input: DataFrom,
 }
 
@@ -20,7 +20,7 @@ impl Day3 {
 		})
 	}
 
-	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
+	pub fn run(&self, _app: &AocApp) -> anyhow::Result<(usize, usize)> {
 		let input = self.input.as_cow_u8()?;
 		let lines: Vec<_> = input
 			.as_ref()
@@ -51,8 +51,6 @@ impl Day3 {
 			score2 += priority;
 		}
 
-		println!("Step 1: {score1}");
-		println!("Step 2: {score2}");
-		Ok(())
+		Ok((score1, score2))
 	}
 }

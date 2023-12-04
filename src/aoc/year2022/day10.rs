@@ -2,17 +2,18 @@ use crate::aoc::helpers::*;
 use crate::AocApp;
 use anyhow::{bail, Context};
 use clap::Parser;
+use std::fmt::Write;
 
 #[derive(Debug, Parser)]
 pub struct Day10 {
 	/// The input file of "opcodes"
-	#[clap(default_value_t = DataFrom::Internal {year: 2022, day: 10})]
+	#[clap(default_value_t = DataFrom::internal(2022, 10))]
 	pub input: DataFrom,
 }
 
 impl Day10 {
 	#[allow(clippy::cast_possible_wrap)]
-	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
+	pub fn run(&self, _app: &AocApp) -> anyhow::Result<(i64, String)> {
 		let mut xs = Vec::with_capacity(1024);
 		xs.push(1); // Buffer to align the cycles
 		xs.push(1);
@@ -41,9 +42,8 @@ impl Day10 {
 			.into_iter()
 			.map(|i| xs[i] * i as i64)
 			.sum::<i64>();
-		println!("Step 1: {score1}");
 
-		print!("Step 2:");
+		let mut score2 = String::new();
 		xs.iter()
 			.copied()
 			.enumerate()
@@ -51,17 +51,17 @@ impl Day10 {
 			.try_for_each(|(i, x)| {
 				let i = (i - 1) % 40;
 				if i == 0 {
-					println!();
+					writeln!(score2).context("failed to write score2")?;
 				}
 				if (isize::try_from(x)? - isize::try_from(i)?).abs() > 1 {
-					print!(" ");
+					writeln!(score2).context("failed to write score2")?;
 				} else {
-					print!("█");
+					writeln!(score2, "█").context("failed to write score2")?;
 				}
 				Ok::<_, anyhow::Error>(())
 			})?;
-		println!();
+		writeln!(score2).context("failed to write score2")?;
 
-		Ok(())
+		Ok((score1, score2))
 	}
 }

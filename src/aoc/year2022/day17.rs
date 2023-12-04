@@ -5,15 +5,12 @@ use clap::Parser;
 #[derive(Debug, Parser)]
 pub struct Day17 {
 	/// The input file of ""
-	#[clap(default_value_t = DataFrom::Internal {year: 2022, day: 17})]
+	#[clap(default_value_t = DataFrom::internal(2022, 17))]
 	pub input: DataFrom,
 }
 
 impl Day17 {
-	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
-		println!("Step 1: {}", -1);
-		println!("Step 2: {}", -1);
-
-		Ok(())
+	pub fn run(&self, _app: &AocApp) -> anyhow::Result<(usize, usize)> {
+		Ok((0, 0))
 	}
 }

@@ -6,12 +6,12 @@ use clap::Parser;
 #[derive(Debug, Parser)]
 pub struct Day2 {
 	/// The input file to use with the parseable type per line
-	#[clap(default_value_t = DataFrom::Internal {year: 2020, day: 2})]
+	#[clap(default_value_t = DataFrom::internal(2020, 2))]
 	pub input: DataFrom,
 }
 
 impl Day2 {
-	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
+	pub fn run(&self, _app: &AocApp) -> anyhow::Result<(usize, usize)> {
 		let mut valid_count_1 = 0;
 		let mut valid_count_2 = 0;
 		process_trimmed_nonempty_lines_of_file(&self.input, |line| {
@@ -27,10 +27,7 @@ impl Day2 {
 			Ok(())
 		})?;
 
-		println!("Step 1: {valid_count_1}");
-		println!("Step 2: {valid_count_2}");
-
-		Ok(())
+		Ok((valid_count_1, valid_count_2))
 	}
 
 	fn is_valid(line: &str) -> anyhow::Result<(bool, bool)> {

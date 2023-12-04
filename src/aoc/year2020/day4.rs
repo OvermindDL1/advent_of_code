@@ -7,7 +7,7 @@ use smol_str::SmolStr;
 #[derive(Debug, Parser)]
 pub struct Day4 {
 	/// The input file to use with the parseable data blank line delimited
-	#[clap(default_value_t = DataFrom::Internal {year: 2020, day: 4})]
+	#[clap(default_value_t = DataFrom::internal(2020, 4))]
 	pub input: DataFrom,
 }
 
@@ -86,7 +86,7 @@ impl Passport {
 }
 
 impl Day4 {
-	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
+	pub fn run(&self, _app: &AocApp) -> anyhow::Result<(usize, usize)> {
 		let mut current = Passport::default();
 		let mut passports = Vec::with_capacity(512);
 		process_trimmed_lines_of_file(&self.input, |line| {
@@ -115,16 +115,10 @@ impl Day4 {
 		})?;
 		passports.push(current);
 
-		println!(
-			"Step 1: {}",
-			passports.iter().filter(|p| p.is_valid()).count()
-		);
+		let score1 = passports.iter().filter(|p| p.is_valid()).count();
 
-		println!(
-			"Step 2: {}",
-			passports.iter().filter(|p| p.is_full_valid()).count()
-		);
+		let score2 = passports.iter().filter(|p| p.is_full_valid()).count();
 
-		Ok(())
+		Ok((score1, score2))
 	}
 }

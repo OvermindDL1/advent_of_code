@@ -10,7 +10,7 @@ use std::str::FromStr;
 #[derive(Debug, Parser)]
 pub struct Day14 {
 	/// The input file of "lines"
-	#[clap(default_value_t = DataFrom::Internal {year: 2022, day: 14})]
+	#[clap(default_value_t = DataFrom::internal(2022, 14))]
 	pub input: DataFrom,
 	/// Render sand animation at scale
 	#[clap(short, long)]
@@ -229,7 +229,7 @@ impl Area {
 }
 
 impl Day14 {
-	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
+	pub fn run(&self, _app: &AocApp) -> anyhow::Result<(usize, usize)> {
 		let input = self.input.as_cow_str()?;
 		let input = input.as_ref();
 
@@ -296,9 +296,6 @@ impl Day14 {
 			count2 += 1; // For the last dropped sand
 		}
 
-		println!("Step 1: {count}");
-		println!("Step 2: {count2}");
-
-		Ok(())
+		Ok((count, count2))
 	}
 }

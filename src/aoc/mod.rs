@@ -107,12 +107,17 @@ macro_rules! run_days {
 			$year::RunAll => $year::run_all($app),
 			$(Self::$day(day) => {
 				println!("### {} - {}", stringify!($year), stringify!($day));
+				day.input.preload()?;
 				let start = std::time::Instant::now();
 				let res = day.run($app);
+				let taken = start.elapsed();
+				let (score1, score2) = anyhow::Context::context(res, "failed to run day")?;
+				println!("Step 1: {score1}");
+				println!("Step 2: {score2}");
 				if $app.verbose >= 1 {
-					println!("_{} Time Taken: {:?}_", stringify!($day), start.elapsed());
+					println!("_{} Time Taken: {:?}_", stringify!($day), taken);
 				}
-				res
+				Ok(())
 			})*
 		}
 	}
@@ -125,12 +130,12 @@ macro_rules! run_all_days {
 			let _ = $app;
 		}
 		println!("## {}", stringify!($self));
-		let year_start = std::time::Instant::now();
+		let start = std::time::Instant::now();
 		$({
 			$self::$day(clap::Parser::parse_from(&[] as &[&str])).run($app)?;
 		})*
 		if $app.verbose >= 1 {
-			println!("_{} Time Taken: {:?}_", stringify!($self), year_start.elapsed());
+			println!("_{} Time Taken: {:?}_", stringify!($self), start.elapsed());
 		}
 		Ok(())
 	}}

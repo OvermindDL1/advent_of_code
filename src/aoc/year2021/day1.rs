@@ -6,33 +6,29 @@ use itertools::Itertools;
 #[derive(Debug, Parser)]
 pub struct Day1 {
 	/// The input file of "depths"
-	#[clap(default_value_t = DataFrom::Internal {year: 2021, day: 1})]
+	#[clap(default_value_t = DataFrom::internal(2021, 1))]
 	pub input: DataFrom,
 }
 
 impl Day1 {
-	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
+	pub fn run(&self, _app: &AocApp) -> anyhow::Result<(usize, usize)> {
 		let nums =
 			map_trimmed_nonempty_lines_of_file(&self.input, |line| Ok(line.parse::<usize>()?))?;
-		println!(
-			"Step 1: {}",
-			nums.iter()
-				.tuple_windows()
-				.map(|(a, b)| a < b)
-				.filter(|&x| x)
-				.count()
-		);
-		println!(
-			"Step 2: {}",
-			nums.iter()
-				.tuple_windows()
-				.map(|(a, b, c)| a + b + c)
-				.tuple_windows()
-				.map(|(a, b)| a < b)
-				.filter(|&x| x)
-				.count()
-		);
+		let score1 = nums
+			.iter()
+			.tuple_windows()
+			.map(|(a, b)| a < b)
+			.filter(|&x| x)
+			.count();
+		let score2 = nums
+			.iter()
+			.tuple_windows()
+			.map(|(a, b, c)| a + b + c)
+			.tuple_windows()
+			.map(|(a, b)| a < b)
+			.filter(|&x| x)
+			.count();
 
-		Ok(())
+		Ok((score1, score2))
 	}
 }

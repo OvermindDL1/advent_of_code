@@ -7,7 +7,7 @@ use std::ops::RangeInclusive;
 #[derive(Debug, Parser)]
 pub struct Day4 {
 	/// The input file of "assignments"
-	#[clap(default_value_t = DataFrom::Internal {year: 2022, day: 4})]
+	#[clap(default_value_t = DataFrom::internal(2022, 4))]
 	pub input: DataFrom,
 }
 
@@ -19,7 +19,7 @@ impl Day4 {
 		Ok(start..=end)
 	}
 
-	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
+	pub fn run(&self, _app: &AocApp) -> anyhow::Result<(usize, usize)> {
 		let mut assignments = Vec::default();
 		process_trimmed_nonempty_lines_of_file(&self.input, |line| {
 			let (first, second) = line.split_once(',').context("not a pair")?;
@@ -49,8 +49,6 @@ impl Day4 {
 			}
 		}
 
-		println!("Step 1: {score1}");
-		println!("Step 2: {score2}");
-		Ok(())
+		Ok((score1, score2))
 	}
 }

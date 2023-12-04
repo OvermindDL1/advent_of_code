@@ -10,7 +10,7 @@ use petgraph::graph::DiGraph;
 #[derive(Debug, Parser)]
 pub struct Day12 {
 	/// The input file of "heightmap"
-	#[clap(default_value_t = DataFrom::Internal {year: 2022, day: 12})]
+	#[clap(default_value_t = DataFrom::internal(2022, 12))]
 	pub input: DataFrom,
 }
 
@@ -23,7 +23,7 @@ fn idx(x: usize, y: usize, width: usize) -> usize {
 // }
 
 impl Day12 {
-	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
+	pub fn run(&self, _app: &AocApp) -> anyhow::Result<(u64, u64)> {
 		let input = self.input.as_cow_str()?;
 		let input = input.as_ref();
 
@@ -136,9 +136,6 @@ impl Day12 {
 		.context("no back path found")?;
 		// dbg!(total_cost2, _path2);
 
-		println!("Step 1: {total_cost1}");
-		println!("Step 2: {total_cost2}");
-
-		Ok(())
+		Ok((total_cost1, total_cost2))
 	}
 }

@@ -15,7 +15,7 @@ use std::fmt::{Debug, Formatter};
 #[derive(Debug, Parser)]
 pub struct Day13 {
 	/// The input file of "number lists"
-	#[clap(default_value_t = DataFrom::Internal {year: 2022, day: 13})]
+	#[clap(default_value_t = DataFrom::internal(2022, 13))]
 	pub input: DataFrom,
 }
 
@@ -120,7 +120,7 @@ impl Data {
 }
 
 impl Day13 {
-	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
+	pub fn run(&self, _app: &AocApp) -> anyhow::Result<(usize, usize)> {
 		let input = self.input.as_cow_str()?;
 		let input = input.as_ref();
 
@@ -160,9 +160,6 @@ impl Day13 {
 			.map(|(i, _d)| i + 1)
 			.product::<usize>();
 
-		println!("Step 1: {score1}");
-		println!("Step 2: {score2}");
-
-		Ok(())
+		Ok((score1, score2))
 	}
 }

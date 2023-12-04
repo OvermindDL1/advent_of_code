@@ -1,6 +1,7 @@
 pub mod day1;
 pub mod day2;
 pub mod day3;
+pub mod day4;
 
 use crate::AocApp;
 use clap::Parser;
@@ -18,9 +19,9 @@ pub enum Year2023 {
 	/// Advent of Code 2023, Day 3: Gear Ratios
 	#[clap(name = "3")]
 	Day3(day3::Day3),
-	// /// Advent of Code 2023, Day 1:
-	// #[clap(name = "4")]
-	// Day4(day4::Day4),
+	/// Advent of Code 2023, Day 4: Scratchcards
+	#[clap(name = "4")]
+	Day4(day4::Day4),
 	// /// Advent of Code 2023, Day 1:
 	// #[clap(name = "5")]
 	// Day5(day5::Day5),
@@ -28,10 +29,10 @@ pub enum Year2023 {
 
 impl Year2023 {
 	pub fn run(&self, app: &AocApp) -> anyhow::Result<()> {
-		crate::run_days!(Year2023, self, app, [Day1, Day2, Day3])
+		crate::run_days!(Year2023, self, app, [Day1, Day2, Day3, Day4])
 	}
 
 	pub fn run_all(app: &AocApp) -> anyhow::Result<()> {
-		crate::run_all_days!(Year2023, app, [Day1, Day2, Day3])
+		crate::run_all_days!(Year2023, app, [Day1, Day2, Day3, Day4])
 	}
 }

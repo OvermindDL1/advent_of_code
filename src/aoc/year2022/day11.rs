@@ -9,7 +9,7 @@ use std::str::FromStr;
 #[derive(Debug, Parser)]
 pub struct Day11 {
 	/// The input file of "monkeys"
-	#[clap(default_value_t = DataFrom::Internal {year: 2022, day: 11})]
+	#[clap(default_value_t = DataFrom::internal(2022, 11))]
 	pub input: DataFrom,
 }
 
@@ -197,7 +197,7 @@ impl Day11 {
 	}
 
 	#[allow(clippy::too_many_lines)]
-	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
+	pub fn run(&self, _app: &AocApp) -> anyhow::Result<(u64, u64)> {
 		let input = self.input.as_cow_str()?;
 		let input = input.as_ref();
 
@@ -251,9 +251,6 @@ impl Day11 {
 		let (_worst, best) = monkeys2.split_at(monkeys.len() - 2);
 		let score2 = best.iter().map(|m| m.inspections).product::<u64>();
 
-		println!("Step 1: {score1}");
-		println!("Step 2: {score2}");
-
-		Ok(())
+		Ok((score1, score2))
 	}
 }

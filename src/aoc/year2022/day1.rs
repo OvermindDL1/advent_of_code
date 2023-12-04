@@ -5,12 +5,12 @@ use clap::Parser;
 #[derive(Debug, Parser)]
 pub struct Day1 {
 	/// The input file of "calories"
-	#[clap(default_value_t = DataFrom::Internal {year: 2022, day: 1})]
+	#[clap(default_value_t = DataFrom::internal(2022, 1))]
 	pub input: DataFrom,
 }
 
 impl Day1 {
-	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
+	pub fn run(&self, _app: &AocApp) -> anyhow::Result<(usize, usize)> {
 		let mut highest = [0; 4];
 		process_trimmed_lines_of_file(&self.input, |line| {
 			if line.is_empty() {
@@ -25,8 +25,6 @@ impl Day1 {
 			highest.sort_unstable();
 			highest[0] = 0;
 		}
-		println!("Step 1: {}", highest[3]);
-		println!("Step 2: {}", highest[1..=3].iter().sum::<usize>());
-		Ok(())
+		Ok((highest[3], highest[1..=3].iter().sum::<usize>()))
 	}
 }

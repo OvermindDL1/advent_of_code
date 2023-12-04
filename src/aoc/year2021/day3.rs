@@ -9,12 +9,12 @@ use std::cmp::Ordering;
 #[derive(Debug, Parser)]
 pub struct Day3 {
 	/// The input file of "diagnostic bits"
-	#[clap(default_value_t = DataFrom::Internal {year: 2021, day: 3})]
+	#[clap(default_value_t = DataFrom::internal(2021, 3))]
 	pub input: DataFrom,
 }
 
 impl Day3 {
-	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
+	pub fn run(&self, _app: &AocApp) -> anyhow::Result<(u32, u32)> {
 		let mut width = 0;
 		let mut nums = map_trimmed_nonempty_lines_of_file(&self.input, |line| {
 			width = line.as_bytes().len();
@@ -37,7 +37,7 @@ impl Day3 {
 				Ok(n | (u32::from(b > half_count) << u32::try_from(i)?))
 			})?;
 		let epsilon = gamma ^ ((1 << width) - 1);
-		println!("Step 1: {}", gamma * epsilon);
+		let score1 = gamma * epsilon;
 
 		let (mut co2s, mut oxygens) =
 			Self::sort_bits_into_slices(nums.as_mut_slice(), width as usize - 1);
@@ -56,9 +56,9 @@ impl Day3 {
 		}
 		let co2_rating = *co2s.first().context("failed finding co2 value")?;
 		let oxygen_rating = *oxygens.first().context("failed finding oxygen value")?;
-		println!("Step 2: {}", oxygen_rating * co2_rating);
+		let score2 = oxygen_rating * co2_rating;
 
-		Ok(())
+		Ok((score1, score2))
 	}
 
 	fn sort_bits_into_slices(nums: &mut [u32], idx: usize) -> (&mut [u32], &mut [u32]) {

@@ -14,7 +14,7 @@ use std::fmt::{Display, Formatter};
 #[derive(Debug, Parser)]
 pub struct Day16 {
 	/// The input file of "valve information"
-	#[clap(default_value_t = DataFrom::Internal {year: 2022, day: 16})]
+	#[clap(default_value_t = DataFrom::internal(2022, 16))]
 	pub input: DataFrom,
 }
 
@@ -34,7 +34,7 @@ struct Valve {
 }
 
 impl Day16 {
-	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
+	pub fn run(&self, app: &AocApp) -> anyhow::Result<(usize, usize)> {
 		let input = self.input.as_cow_str()?;
 		let input = input.as_ref();
 
@@ -108,10 +108,12 @@ impl Day16 {
 			}
 		}
 
-		std::fs::write(
-			"2022-16.dot",
-			format!("{:?}", Dot::with_config(&graph, &[])),
-		)?;
+		if app.verbose > 1 {
+			std::fs::write(
+				"2022-16.dot",
+				format!("{:?}", Dot::with_config(&graph, &[])),
+			)?;
+		}
 		// dbg!(&graph);
 		// for xs in paths.row_iter() {
 		// 	for x in &xs {
@@ -230,10 +232,7 @@ impl Day16 {
 		// }
 		// println!();
 
-		println!("Step 1: {score1}");
-		println!("Step 2: {score2}");
-
-		Ok(())
+		Ok((score1, score2))
 	}
 }
 

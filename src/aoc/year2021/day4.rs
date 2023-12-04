@@ -6,7 +6,7 @@ use clap::Parser;
 #[derive(Debug, Parser)]
 pub struct Day4 {
 	/// The input file of bingo calls and cards
-	#[clap(default_value_t = DataFrom::Internal {year: 2021, day: 4})]
+	#[clap(default_value_t = DataFrom::internal(2021, 4))]
 	pub input: DataFrom,
 }
 
@@ -84,7 +84,7 @@ impl Card {
 }
 
 impl Day4 {
-	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
+	pub fn run(&self, _app: &AocApp) -> anyhow::Result<(u32, u32)> {
 		let mut calls = Vec::with_capacity(1024);
 		let mut cards = Vec::with_capacity(128);
 		let mut card: Card = Card::default();
@@ -141,21 +141,15 @@ impl Day4 {
 			}
 		}
 
-		println!(
-			"Step 1: {}",
-			cards
-				.first()
-				.context("no input cards")?
-				.solution(*winning_nums.first().context("no input cards")?)
-		);
-		println!(
-			"Step 2: {}",
-			cards
-				.last()
-				.context("no input cards")?
-				.solution(*winning_nums.last().context("no input cards")?)
-		);
+		let score1 = cards
+			.first()
+			.context("no input cards")?
+			.solution(*winning_nums.first().context("no input cards")?);
+		let score2 = cards
+			.last()
+			.context("no input cards")?
+			.solution(*winning_nums.last().context("no input cards")?);
 
-		Ok(())
+		Ok((score1, score2))
 	}
 }

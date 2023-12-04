@@ -6,12 +6,14 @@ use std::cmp::Ordering;
 #[derive(Debug, Parser)]
 pub struct Day1 {
 	/// The input file to use full of integers one per line
-	#[clap(default_value_t = DataFrom::Internal {year: 2020, day: 1})]
+	#[clap(default_value_t = DataFrom::internal(2020, 1))]
 	pub input: DataFrom,
 }
 
 impl Day1 {
-	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
+	pub fn run(&self, _app: &AocApp) -> anyhow::Result<(usize, usize)> {
+		let mut score1 = 0;
+		let mut score2 = 0;
 		let mut nums =
 			map_trimmed_nonempty_lines_of_file(&self.input, |line| Ok(line.parse::<usize>()?))?;
 		nums.sort_unstable();
@@ -21,7 +23,7 @@ impl Day1 {
 				match (nums[a] + nums[b]).cmp(&2020) {
 					Ordering::Less => {}
 					Ordering::Equal => {
-						println!("Step 1: {}", nums[a] * nums[b]);
+						score1 = nums[a] * nums[b];
 						break;
 					}
 					Ordering::Greater => {
@@ -40,7 +42,7 @@ impl Day1 {
 					match (nums[a] + nums[b] + nums[c]).cmp(&2020) {
 						Ordering::Less => {}
 						Ordering::Equal => {
-							println!("Step 2: {}", nums[a] * nums[b] * nums[c]);
+							score2 = nums[a] * nums[b] * nums[c];
 							break;
 						}
 						Ordering::Greater => {
@@ -64,6 +66,6 @@ impl Day1 {
 		// 	.map(|(a, b, c)| a * b * c)
 		// 	.for_each(|a| println!("Step 2: {}", a));
 
-		Ok(())
+		Ok((score1, score2))
 	}
 }

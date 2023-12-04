@@ -8,7 +8,7 @@ use std::str::FromStr;
 #[derive(Debug, Parser)]
 pub struct Day8 {
 	/// The input file to use with the parseable instructions
-	#[clap(default_value_t = DataFrom::Internal {year: 2020, day: 8})]
+	#[clap(default_value_t = DataFrom::internal(2020, 8))]
 	pub input: DataFrom,
 }
 
@@ -126,7 +126,7 @@ impl Program {
 }
 
 impl Day8 {
-	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
+	pub fn run(&self, _app: &AocApp) -> anyhow::Result<(i32, i32)> {
 		let insns = map_trimmed_nonempty_lines_of_file(&self.input, |line| {
 			line.parse::<Insns>().context("Failed to parse instruction")
 		})?;
@@ -136,19 +136,20 @@ impl Day8 {
 			anyhow::bail!("program terminated when it shouldn't have");
 		}
 
-		println!("Step 1: {}", program.acc);
+		let score1 = program.acc;
 
+		let mut score2 = 0;
 		for i in (0..program.insns.len()).rev() {
 			if !program.flip_jmp_nop_at(i32::try_from(i)?)? {
 				continue;
 			}
 			if program.reset_and_run_until_halt_or_insn_run_more_than(1)? {
-				println!("Step 2: {}", program.acc);
+				score2 = program.acc;
 				break;
 			}
 			program.flip_jmp_nop_at(i32::try_from(i)?)?;
 		}
 
-		Ok(())
+		Ok((score1, score2))
 	}
 }

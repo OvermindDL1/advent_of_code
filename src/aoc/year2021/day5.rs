@@ -9,7 +9,7 @@ use std::str::FromStr;
 #[derive(Debug, Parser)]
 pub struct Day5 {
 	/// The input file of lines as coordinates
-	#[clap(default_value_t = DataFrom::Internal {year: 2021, day: 5})]
+	#[clap(default_value_t = DataFrom::internal(2021, 5))]
 	pub input: DataFrom,
 }
 
@@ -128,7 +128,7 @@ impl Grid {
 }
 
 impl Day5 {
-	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
+	pub fn run(&self, _app: &AocApp) -> anyhow::Result<(u32, u32)> {
 		let lines = map_trimmed_nonempty_lines_of_file(&self.input, Line::from_str)?;
 		let size = lines.iter().fold((0, 0), |(x, y), line| {
 			let (min_x, min_y) = line.get_minimum_size();
@@ -137,9 +137,9 @@ impl Day5 {
 		let grid_step1 = Grid::from_lines(lines.iter().filter(|l| l.is_straight()), size);
 		let grid_step2 = Grid::from_lines(&lines, size);
 
-		println!("Step 1: {}", grid_step1.count_above_1()?);
-		println!("Step 2: {}", grid_step2.count_above_1()?);
+		let score1 = grid_step1.count_above_1()?;
+		let score2 = grid_step2.count_above_1()?;
 
-		Ok(())
+		Ok((score1, score2))
 	}
 }

@@ -10,7 +10,7 @@ use termcolor::{BufferWriter, Color, ColorSpec, WriteColor};
 #[derive(Debug, Parser)]
 pub struct Day8 {
 	/// The input file of "tree heights"
-	#[clap(default_value_t = DataFrom::Internal {year: 2022, day: 8})]
+	#[clap(default_value_t = DataFrom::internal(2022, 8))]
 	pub input: DataFrom,
 }
 
@@ -183,7 +183,7 @@ impl HeightMap {
 }
 
 impl Day8 {
-	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
+	pub fn run(&self, _app: &AocApp) -> anyhow::Result<(usize, usize)> {
 		let input = self.input.as_cow_u8()?;
 		let input = input.as_ref();
 
@@ -192,8 +192,6 @@ impl Day8 {
 		// map.print_trees()?;
 		// map.print_visible();
 
-		println!("Step 1: {}", map.count_visible());
-		println!("Step 2: {}", map.best_scenic_score());
-		Ok(())
+		Ok((map.count_visible(), map.best_scenic_score()))
 	}
 }

@@ -6,12 +6,12 @@ use clap::Parser;
 #[derive(Debug, Parser)]
 pub struct Day2 {
 	/// The input file of "Dice counts"
-	#[clap(default_value_t = DataFrom::Internal {year: 2023, day: 2})]
+	#[clap(default_value_t = DataFrom::internal(2023, 2))]
 	pub input: DataFrom,
 }
 
 impl Day2 {
-	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
+	pub fn run(&self, _app: &AocApp) -> anyhow::Result<(u32, u32)> {
 		// (red, green, blue)
 		let step1_max_color_counts = (12, 13, 14);
 		let mut score1 = 0;
@@ -73,9 +73,6 @@ impl Day2 {
 			Ok(())
 		})?;
 
-		println!("Step 1: {score1}");
-		println!("Step 2: {score2}");
-
-		Ok(())
+		Ok((score1, score2))
 	}
 }

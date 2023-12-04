@@ -7,7 +7,7 @@ use clap::Parser;
 #[derive(Debug, Parser)]
 pub struct Day9 {
 	/// The input file of "movement commands"
-	#[clap(default_value_t = DataFrom::Internal {year: 2022, day: 9})]
+	#[clap(default_value_t = DataFrom::internal(2022, 9))]
 	pub input: DataFrom,
 }
 
@@ -60,7 +60,7 @@ impl State {
 }
 
 impl Day9 {
-	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
+	pub fn run(&self, _app: &AocApp) -> anyhow::Result<(usize, usize)> {
 		let mut state = State::default();
 		process_trimmed_nonempty_lines_of_file(&self.input, |line| {
 			match line.as_bytes() {
@@ -88,6 +88,6 @@ impl Day9 {
 
 		println!("Step 1: {}", state.touched1.len());
 		println!("Step 2: {}", state.touched9.len());
-		Ok(())
+		Ok((state.touched1.len(), state.touched9.len()))
 	}
 }

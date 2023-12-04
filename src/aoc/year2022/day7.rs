@@ -9,12 +9,12 @@ use std::path::PathBuf;
 #[derive(Debug, Parser)]
 pub struct Day7 {
 	/// The input file of "terminal history"
-	#[clap(default_value_t = DataFrom::Internal {year: 2022, day: 7})]
+	#[clap(default_value_t = DataFrom::internal(2022, 7))]
 	pub input: DataFrom,
 }
 
 impl Day7 {
-	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
+	pub fn run(&self, _app: &AocApp) -> anyhow::Result<(usize, usize)> {
 		let input = self.input.as_cow_str()?;
 		let input = input.as_ref().trim();
 
@@ -87,8 +87,6 @@ impl Day7 {
 			.copied()
 			.context("no directory is large enough to free enough space")?;
 
-		println!("Step 1: {score1}");
-		println!("Step 2: {score2}");
-		Ok(())
+		Ok((score1, score2))
 	}
 }

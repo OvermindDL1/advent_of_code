@@ -1,5 +1,6 @@
 use crate::Inputs;
 use anyhow::Context;
+use arc_swap::ArcSwapOption;
 use std::borrow::Cow;
 use std::ffi::OsStr;
 use std::fmt::{Display, Formatter};
@@ -7,9 +8,25 @@ use std::fs::File;
 use std::io::BufRead;
 use std::path::PathBuf;
 use std::str::FromStr;
+use std::sync::Arc;
+
+#[derive(Debug)]
+pub struct DataFrom {
+	data: DataFromState,
+	cache: ArcSwapOption<Cow<'static, str>>,
+}
+
+impl Clone for DataFrom {
+	fn clone(&self) -> Self {
+		DataFrom {
+			data: self.data.clone(),
+			cache: ArcSwapOption::default(),
+		}
+	}
+}
 
 #[derive(Clone, Debug)]
-pub enum DataFrom {
+pub enum DataFromState {
 	Internal { year: u16, day: u8 },
 	Static(Cow<'static, str>),
 	Stdin,
@@ -17,10 +34,26 @@ pub enum DataFrom {
 }
 
 impl DataFrom {
-	pub fn as_cow_str(&self) -> anyhow::Result<Cow<str>> {
+	#[must_use]
+	pub fn internal(year: u16, day: u8) -> Self {
+		DataFrom {
+			data: DataFromState::Internal { year, day },
+			cache: ArcSwapOption::default(),
+		}
+	}
+	pub fn preload(&self) -> anyhow::Result<()> {
+		let data = self.as_cow_str()?;
+		self.cache.store(Some(Arc::new(data)));
+		Ok(())
+	}
+
+	pub fn as_cow_str(&self) -> anyhow::Result<Cow<'static, str>> {
 		use std::io::Read;
-		Ok(match self {
-			DataFrom::Internal { year, day } => {
+		if let Some(data) = &*self.cache.load() {
+			return Ok(Cow::clone(data));
+		}
+		Ok(match &self.data {
+			DataFromState::Internal { year, day } => {
 				// let path = &format!("{year}/day{day}.input");
 				let y0 = (year / 1000) as u8 + b'0';
 				let y1 = ((year / 100) % 10) as u8 + b'0';
@@ -41,15 +74,15 @@ impl DataFrom {
 						.context("input must be valid utf-8")?,
 				)
 			}
-			DataFrom::Static(data) => data.clone(),
-			DataFrom::Stdin => {
+			DataFromState::Static(data) => data.clone(),
+			DataFromState::Stdin => {
 				let mut data = Vec::default();
 				std::io::stdin()
 					.read_to_end(&mut data)
 					.context("invalid read from stdin")?;
 				Cow::Owned(String::from_utf8(data).context("input must be valid utf-8")?)
 			}
-			DataFrom::FilePath(path) => {
+			DataFromState::FilePath(path) => {
 				let data = std::fs::read_to_string(path)
 					.with_context(|| format!("invalid read from path: {path:?}"))?;
 				Cow::Owned(data)
@@ -59,8 +92,13 @@ impl DataFrom {
 
 	pub fn as_cow_u8(&self) -> anyhow::Result<Cow<[u8]>> {
 		use std::io::Read;
-		Ok(match self {
-			DataFrom::Internal { year, day } => {
+		if let Some(data) = &*self.cache.load() {
+			if let Cow::Borrowed(data) = Arc::as_ref(data) {
+				return Ok(Cow::Borrowed(data.as_bytes()));
+			}
+		}
+		Ok(match &self.data {
+			DataFromState::Internal { year, day } => {
 				// let path = &format!("{year}/day{day}.input");
 				let y0 = (year / 1000) as u8 + b'0';
 				let y1 = ((year / 100) % 10) as u8 + b'0';
@@ -78,15 +116,15 @@ impl DataFrom {
 					.context("invalid internal year day")?;
 				data.data
 			}
-			DataFrom::Static(data) => Cow::Borrowed(data.as_bytes()),
-			DataFrom::Stdin => {
+			DataFromState::Static(data) => Cow::Borrowed(data.as_bytes()),
+			DataFromState::Stdin => {
 				let mut data = Vec::default();
 				std::io::stdin()
 					.read_to_end(&mut data)
 					.context("invalid read from stdin")?;
 				Cow::Owned(data)
 			}
-			DataFrom::FilePath(path) => {
+			DataFromState::FilePath(path) => {
 				let data = std::fs::read(path)
 					.with_context(|| format!("invalid read from path: {path:?}"))?;
 				Cow::Owned(data)
@@ -95,13 +133,13 @@ impl DataFrom {
 	}
 }
 
-impl Display for DataFrom {
+impl Display for DataFromState {
 	fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
 		match self {
-			DataFrom::Internal { year, day } => f.write_fmt(format_args!(":{year}:{day}")),
-			DataFrom::Static(data) => f.write_str(data),
-			DataFrom::Stdin => f.write_str("-"),
-			DataFrom::FilePath(filepath) => {
+			DataFromState::Internal { year, day } => f.write_fmt(format_args!(":{year}:{day}")),
+			DataFromState::Static(data) => f.write_str(data),
+			DataFromState::Stdin => f.write_str("-"),
+			DataFromState::FilePath(filepath) => {
 				if let Some(p) = filepath.to_str() {
 					f.write_str(p)
 				} else {
@@ -112,31 +150,48 @@ impl Display for DataFrom {
 	}
 }
 
+impl Display for DataFrom {
+	fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+		self.data.fmt(f)
+	}
+}
+
 impl FromStr for DataFrom {
 	type Err = anyhow::Error;
 
 	fn from_str(s: &str) -> Result<Self, Self::Err> {
+		Ok(DataFrom {
+			data: DataFromState::from_str(s)?,
+			cache: ArcSwapOption::default(),
+		})
+	}
+}
+
+impl FromStr for DataFromState {
+	type Err = anyhow::Error;
+
+	fn from_str(s: &str) -> Result<Self, Self::Err> {
 		if s == "-" {
-			Ok(DataFrom::Stdin)
+			Ok(DataFromState::Stdin)
 		} else if let Some(s) = s.strip_prefix(':') {
 			let (year, day) = s.split_once(':').context("invalid :year:day order")?;
 			let year = year.parse().with_context(|| "invalid :year:day order")?;
 			let day = day.parse().with_context(|| "invalid :year:day order")?;
-			Ok(DataFrom::Internal { year, day })
+			Ok(DataFromState::Internal { year, day })
 		} else if s.contains('\n') {
-			Ok(DataFrom::Static(Cow::Owned(s.to_string())))
+			Ok(DataFromState::Static(Cow::Owned(s.to_string())))
 		} else {
-			Ok(DataFrom::FilePath(PathBuf::from(s)))
+			Ok(DataFromState::FilePath(PathBuf::from(s)))
 		}
 	}
 }
 
-impl From<&OsStr> for DataFrom {
+impl From<&OsStr> for DataFromState {
 	fn from(s: &OsStr) -> Self {
 		if let Some(s) = s.to_str() {
-			DataFrom::from_str(s).expect("can't happen")
+			DataFromState::from_str(s).expect("can't happen")
 		} else {
-			DataFrom::FilePath(PathBuf::from(s))
+			DataFromState::FilePath(PathBuf::from(s))
 		}
 	}
 }
@@ -146,8 +201,8 @@ pub fn process_lines_of_file(
 	mut cb: impl FnMut(&str) -> anyhow::Result<()>,
 ) -> anyhow::Result<()> {
 	use std::io::BufReader;
-	match data {
-		DataFrom::Internal { year, day } => {
+	match &data.data {
+		DataFromState::Internal { year, day } => {
 			// let path = format!("{year}/day{day}.input");
 			let y0 = (year / 1000) as u8 + b'0';
 			let y1 = ((year / 100) % 10) as u8 + b'0';
@@ -164,12 +219,12 @@ pub fn process_lines_of_file(
 				cb(line).with_context(|| format!("Failed parsing line: {line}"))?;
 			}
 		}
-		DataFrom::Static(data) => {
+		DataFromState::Static(data) => {
 			for line in data.lines() {
 				cb(line).with_context(|| format!("Failed parsing line: {line}"))?;
 			}
 		}
-		DataFrom::Stdin => {
+		DataFromState::Stdin => {
 			let stdin = std::io::stdin();
 			let mut handle = stdin.lock();
 			let mut line = String::with_capacity(64);
@@ -178,7 +233,7 @@ pub fn process_lines_of_file(
 				line.clear();
 			}
 		}
-		DataFrom::FilePath(filepath) => {
+		DataFromState::FilePath(filepath) => {
 			let mut data = BufReader::new(File::open(filepath)?);
 			let mut line = String::with_capacity(64);
 			while data.read_line(&mut line)? > 0 {
@@ -194,8 +249,8 @@ pub fn process_lines_of_file_bytes(
 	data: &DataFrom,
 	mut cb: impl FnMut(&[u8]) -> anyhow::Result<()>,
 ) -> anyhow::Result<()> {
-	match data {
-		DataFrom::Internal { year, day } => {
+	match &data.data {
+		DataFromState::Internal { year, day } => {
 			// let path = format!("{year}/day{day}.input");
 			let y0 = (year / 1000) as u8 + b'0';
 			let y1 = ((year / 100) % 10) as u8 + b'0';
@@ -214,14 +269,14 @@ pub fn process_lines_of_file_bytes(
 				})?;
 			}
 		}
-		DataFrom::Static(data) => {
+		DataFromState::Static(data) => {
 			for line in data.as_bytes().split(|&b| b == b'\n') {
 				cb(line).with_context(|| {
 					format!("Failed parsing line: {:?}", std::str::from_utf8(line))
 				})?;
 			}
 		}
-		DataFrom::Stdin => {
+		DataFromState::Stdin => {
 			let stdin = std::io::stdin();
 			let mut handle = stdin.lock();
 			let mut line = Vec::with_capacity(64);
@@ -232,7 +287,7 @@ pub fn process_lines_of_file_bytes(
 				line.clear();
 			}
 		}
-		DataFrom::FilePath(filepath) => {
+		DataFromState::FilePath(filepath) => {
 			let mut data = std::io::BufReader::new(File::open(filepath)?);
 			let mut line = Vec::with_capacity(64);
 			while data.read_until(b'\n', &mut line)? > 0 {

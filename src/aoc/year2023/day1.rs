@@ -6,15 +6,15 @@ use clap::Parser;
 #[derive(Debug, Parser)]
 pub struct Day1 {
 	/// The input file of "calibration data"
-	#[clap(default_value_t = DataFrom::Internal {year: 2023, day: 1})]
+	#[clap(default_value_t = DataFrom::internal(2023, 1))]
 	pub input: DataFrom,
 }
 
 impl Day1 {
-	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
+	pub fn run(&self, _app: &AocApp) -> anyhow::Result<(i32, i32)> {
 		let (step1, step2) = fold_trimmed_nonempty_lines_of_file_bytes(
 			&self.input,
-			(0u32, 0u32),
+			(0i32, 0i32),
 			|(acc1, acc2), line| {
 				let step1 = {
 					let first = line
@@ -38,7 +38,7 @@ impl Day1 {
 								std::str::from_utf8(line)
 							)
 						})?;
-					(first - b'0') as u32 * 10 + (last - b'0') as u32
+					(first - b'0') as i32 * 10 + (last - b'0') as i32
 				};
 
 				let step2 = {
@@ -92,9 +92,6 @@ impl Day1 {
 			},
 		)?;
 
-		println!("Step 1: {step1}");
-		println!("Step 2: {step2}");
-
-		Ok(())
+		Ok((step1, step2))
 	}
 }

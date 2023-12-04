@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 ahash = { version = "0.8", default-features = false, features = ["no-rng", "std"] }
 anyhow = "1.0"
+arc-swap = "1.6.0"
 bit-set = "0.5.3"
 bytecount = { version = "0.6.7", features = ["runtime-dispatch-simd"] }
 chrono = { version = "0.4", default-features = false, features = [] }

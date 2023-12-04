@@ -6,7 +6,7 @@ use clap::Parser;
 #[derive(Debug, Parser)]
 pub struct Day6 {
 	/// The input file of
-	#[clap(default_value_t = DataFrom::Internal {year: 2021, day: 6})]
+	#[clap(default_value_t = DataFrom::internal(2021, 6))]
 	pub input: DataFrom,
 }
 
@@ -33,7 +33,7 @@ impl LifeStateCounts {
 }
 
 impl Day6 {
-	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
+	pub fn run(&self, _app: &AocApp) -> anyhow::Result<(usize, usize)> {
 		let mut counts = LifeStateCounts::default();
 		process_trimmed_nonempty_lines_of_file(&self.input, |line| {
 			for num in line.split(',') {
@@ -53,10 +53,10 @@ impl Day6 {
 		})?;
 
 		(0..80).for_each(|_| counts.tick());
-		println!("Step 1: {:?}", counts.sum());
+		let score1 = counts.sum();
 		(80..256).for_each(|_| counts.tick());
-		println!("Step 2: {:?}", counts.sum());
+		let score2 = counts.sum();
 
-		Ok(())
+		Ok((score1, score2))
 	}
 }

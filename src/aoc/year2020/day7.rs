@@ -10,12 +10,12 @@ use std::collections::{HashMap, HashSet};
 #[derive(Debug, Parser)]
 pub struct Day7 {
 	/// The input file to use with the parseable rules
-	#[clap(default_value_t = DataFrom::Internal {year: 2020, day: 7})]
+	#[clap(default_value_t = DataFrom::internal(2020, 7))]
 	pub input: DataFrom,
 }
 
 impl Day7 {
-	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
+	pub fn run(&self, _app: &AocApp) -> anyhow::Result<(usize, usize)> {
 		let mut rules_graph = Graph::new();
 		let mut rules = HashMap::with_capacity(1024);
 		process_trimmed_nonempty_lines_of_file(&self.input, |line| {
@@ -49,7 +49,7 @@ impl Day7 {
 			}
 		}
 
-		{
+		let score1 = {
 			let mut possible_external_colors = HashSet::with_capacity(rules.len());
 			let mut to_process = Vec::with_capacity(rules.len());
 			to_process.push(rules["shiny gold"].0);
@@ -60,10 +60,10 @@ impl Day7 {
 					}
 				}
 			}
-			println!("Step 1: {}", possible_external_colors.len());
-		}
+			possible_external_colors.len()
+		};
 
-		{
+		let score2 = {
 			let mut total_bags = HashMap::with_capacity(rules.len());
 			let mut to_process = Vec::with_capacity(rules.len());
 			to_process.push((rules["shiny gold"].0, 1));
@@ -73,9 +73,9 @@ impl Day7 {
 					to_process.push((edge.target(), *edge.weight() * mult));
 				}
 			}
-			println!("Step 1: {}", total_bags.values().sum::<usize>());
-		}
+			total_bags.values().sum::<usize>()
+		};
 
-		Ok(())
+		Ok((score1, score2))
 	}
 }

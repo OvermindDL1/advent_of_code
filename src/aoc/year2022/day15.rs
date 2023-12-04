@@ -9,7 +9,7 @@ use std::str::FromStr;
 #[derive(Debug, Parser)]
 pub struct Day15 {
 	/// The input file of "Sensor and Beacon locations"
-	#[clap(default_value_t = DataFrom::Internal {year: 2022, day: 15})]
+	#[clap(default_value_t = DataFrom::internal(2022, 15))]
 	pub input: DataFrom,
 }
 
@@ -288,7 +288,7 @@ impl Data {
 }
 
 impl Day15 {
-	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
+	pub fn run(&self, _app: &AocApp) -> anyhow::Result<(i32, i64)> {
 		let input = self.input.as_cow_str()?;
 		let input = input.as_ref();
 
@@ -302,13 +302,11 @@ impl Day15 {
 			|acc, _x, _y, cell| Ok(acc + i32::from(cell.is_known_and_not_beacon())),
 		)?;
 
-		println!("Step 1: {score1}");
-
 		let coords2 = sensors
 			.find_empty(0..=4_000_000, 0..=4_000_000)
 			.context("didn't find an unknown spot")?;
-		println!("Step 2: {}", coords2.0 * 4_000_000 + coords2.1);
+		let score2 = coords2.0 * 4_000_000 + coords2.1;
 
-		Ok(())
+		Ok((score1, score2))
 	}
 }
