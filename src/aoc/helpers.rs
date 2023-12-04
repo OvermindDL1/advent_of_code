@@ -21,8 +21,19 @@ impl DataFrom {
 		use std::io::Read;
 		Ok(match self {
 			DataFrom::Internal { year, day } => {
-				let path = format!("{year}/day{day}.input");
-				let data = Inputs::get(&path)
+				// let path = &format!("{year}/day{day}.input");
+				let y0 = (year / 1000) as u8 + b'0';
+				let y1 = ((year / 100) % 10) as u8 + b'0';
+				let y2 = ((year / 10) % 10) as u8 + b'0';
+				let y3 = (year % 10) as u8 + b'0';
+				let d0 = (day / 10) + b'0';
+				let d1 = (day % 10) + b'0';
+				let path = &[
+					y0, y1, y2, y3, b'/', b'd', b'a', b'y', d0, d1, b'.', b'i', b'n', b'p', b'u',
+					b't',
+				] as &[u8];
+				let path = unsafe { std::str::from_utf8_unchecked(path) };
+				let data = Inputs::get(path)
 					.with_context(|| format!("missing {}", &path))
 					.context("invalid internal input year and/or day")?;
 				Cow::Owned(
@@ -50,8 +61,19 @@ impl DataFrom {
 		use std::io::Read;
 		Ok(match self {
 			DataFrom::Internal { year, day } => {
-				let path = format!("{year}/day{day}.input");
-				let data = Inputs::get(&path)
+				// let path = &format!("{year}/day{day}.input");
+				let y0 = (year / 1000) as u8 + b'0';
+				let y1 = ((year / 100) % 10) as u8 + b'0';
+				let y2 = ((year / 10) % 10) as u8 + b'0';
+				let y3 = (year % 10) as u8 + b'0';
+				let d0 = (day / 10) + b'0';
+				let d1 = (day % 10) + b'0';
+				let path = &[
+					y0, y1, y2, y3, b'/', b'd', b'a', b'y', d0, d1, b'.', b'i', b'n', b'p', b'u',
+					b't',
+				] as &[u8];
+				let path = unsafe { std::str::from_utf8_unchecked(path) };
+				let data = Inputs::get(path)
 					.with_context(|| format!("missing {}", &path))
 					.context("invalid internal year day")?;
 				data.data
@@ -137,7 +159,7 @@ pub fn process_lines_of_file(
 				y0, y1, y2, y3, b'/', b'd', b'a', b'y', d0, d1, b'.', b'i', b'n', b'p', b'u', b't',
 			] as &[u8];
 			let path = unsafe { std::str::from_utf8_unchecked(path) };
-			let data = Inputs::get(&path).with_context(|| format!("missing {path}"))?;
+			let data = Inputs::get(path).with_context(|| format!("missing {path}"))?;
 			for line in std::str::from_utf8(data.data.as_ref())?.lines() {
 				cb(line).with_context(|| format!("Failed parsing line: {line}"))?;
 			}
