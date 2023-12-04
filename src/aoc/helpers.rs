@@ -201,6 +201,12 @@ pub fn process_lines_of_file(
 	mut cb: impl FnMut(&str) -> anyhow::Result<()>,
 ) -> anyhow::Result<()> {
 	use std::io::BufReader;
+	if let Some(data) = &*data.cache.load() {
+		for line in data.lines() {
+			cb(line).with_context(|| format!("Failed parsing line: {data}"))?;
+		}
+		return Ok(());
+	}
 	match &data.data {
 		DataFromState::Internal { year, day } => {
 			// let path = format!("{year}/day{day}.input");
