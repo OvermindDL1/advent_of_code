@@ -112,8 +112,10 @@ macro_rules! run_days {
 				let res = day.run($app);
 				let taken = start.elapsed();
 				let (score1, score2) = anyhow::Context::context(res, "failed to run day")?;
-				println!("Step 1: {score1}");
-				println!("Step 2: {score2}");
+				if !$app.hide_scores {
+					println!("Step 1: {score1}");
+					println!("Step 2: {score2}");
+				}
 				if $app.verbose >= 1 {
 					println!("_{} Time Taken: {:?}_", stringify!($day), taken);
 				}

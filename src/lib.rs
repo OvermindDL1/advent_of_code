@@ -19,6 +19,9 @@ pub struct AocApp {
 	/// Level of verbosity, can be used multiple times for more verbosity
 	#[clap(short, long, action = clap::ArgAction::Count)]
 	pub verbose: u8,
+	/// Do not show the scores (quiet/spoiler mode)
+	#[clap(short = 'q', long)]
+	pub hide_scores: bool,
 	/// The command to execute
 	#[clap(subcommand)]
 	command: AocAppCommand,
