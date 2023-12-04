@@ -3,16 +3,14 @@ use crate::AocApp;
 use clap::Parser;
 
 #[derive(Debug, Parser)]
-pub struct Day2 {
+pub struct Day4 {
 	/// The input file of ""
-	#[clap(default_value_t = DataFrom::Internal {year: 2023, day: 2})]
+	#[clap(default_value_t = DataFrom::Internal {year: 2023, day: 4})]
 	pub input: DataFrom,
 }
 
-impl Day2 {
+impl Day4 {
 	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
-		// fold_trimmed_nonempty_lines_of_file_bytes
-
 		println!("Step 1: {}", -1);
 		println!("Step 2: {}", -1);
 

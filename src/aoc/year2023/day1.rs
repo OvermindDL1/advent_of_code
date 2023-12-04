@@ -5,37 +5,49 @@ use clap::Parser;
 
 #[derive(Debug, Parser)]
 pub struct Day1 {
-	/// The input file of ""
+	/// The input file of "calibration data"
 	#[clap(default_value_t = DataFrom::Internal {year: 2023, day: 1})]
 	pub input: DataFrom,
 }
 
 impl Day1 {
 	pub fn run(&self, _app: &AocApp) -> anyhow::Result<()> {
-		let (step1, step2) = fold_trimmed_nonempty_lines_of_file(
+		let (step1, step2) = fold_trimmed_nonempty_lines_of_file_bytes(
 			&self.input,
 			(0u32, 0u32),
 			|(acc1, acc2), line| {
 				let step1 = {
 					let first = line
-						.bytes()
+						.iter()
+						.copied()
 						.find(u8::is_ascii_digit)
-						.ok_or_else(|| anyhow::anyhow!("No number found in line: {}", line))?;
+						.ok_or_else(|| {
+							anyhow::anyhow!(
+								"No number found in line: {:?}",
+								std::str::from_utf8(line)
+							)
+						})?;
 					let last = line
-						.bytes()
+						.iter()
+						.copied()
 						.rev()
 						.find(u8::is_ascii_digit)
-						.ok_or_else(|| anyhow::anyhow!("No number found in line: {}", line))?;
+						.ok_or_else(|| {
+							anyhow::anyhow!(
+								"No number found in line: {:?}",
+								std::str::from_utf8(line)
+							)
+						})?;
 					(first - b'0') as u32 * 10 + (last - b'0') as u32
 				};
 
 				let step2 = {
 					// Eh, regex would be easier, but this fun and maybe even faster?
 					let first = {
-						let mut bytes = line.as_bytes();
+						let mut bytes = line;
 						loop {
 							if bytes.is_empty() {
-								bail!("No number found in line: {}", line);
+								bail!("No number found in line: {:?}", std::str::from_utf8(line));
 							}
 							match bytes {
 								[b'0', ..] | [b'z', b'e', b'r', b'o', ..] => break 00,
@@ -53,10 +65,10 @@ impl Day1 {
 						}
 					};
 					let last = {
-						let mut bytes = line.as_bytes();
+						let mut bytes = line;
 						loop {
 							if bytes.is_empty() {
-								bail!("No number found in line: {}", line);
+								bail!("No number found in line: {:?}", std::str::from_utf8(line));
 							}
 							match bytes {
 								[.., b'0'] | [.., b'z', b'e', b'r', b'o'] => break 0,

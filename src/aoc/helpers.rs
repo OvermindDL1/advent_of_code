@@ -4,7 +4,7 @@ use std::borrow::Cow;
 use std::ffi::OsStr;
 use std::fmt::{Display, Formatter};
 use std::fs::File;
-use std::io::{BufRead, BufReader, Read};
+use std::io::BufRead;
 use std::path::PathBuf;
 use std::str::FromStr;
 
@@ -18,6 +18,7 @@ pub enum DataFrom {
 
 impl DataFrom {
 	pub fn as_cow_str(&self) -> anyhow::Result<Cow<str>> {
+		use std::io::Read;
 		Ok(match self {
 			DataFrom::Internal { year, day } => {
 				let path = format!("{year}/day{day}.input");
@@ -46,6 +47,7 @@ impl DataFrom {
 	}
 
 	pub fn as_cow_u8(&self) -> anyhow::Result<Cow<[u8]>> {
+		use std::io::Read;
 		Ok(match self {
 			DataFrom::Internal { year, day } => {
 				let path = format!("{year}/day{day}.input");
@@ -121,10 +123,21 @@ pub fn process_lines_of_file(
 	data: &DataFrom,
 	mut cb: impl FnMut(&str) -> anyhow::Result<()>,
 ) -> anyhow::Result<()> {
+	use std::io::BufReader;
 	match data {
 		DataFrom::Internal { year, day } => {
-			let path = format!("{year}/day{day}.input");
-			let data = Inputs::get(&path).with_context(|| format!("missing {}", &path))?;
+			// let path = format!("{year}/day{day}.input");
+			let y0 = (year / 1000) as u8 + b'0';
+			let y1 = ((year / 100) % 10) as u8 + b'0';
+			let y2 = ((year / 10) % 10) as u8 + b'0';
+			let y3 = (year % 10) as u8 + b'0';
+			let d0 = (day / 10) + b'0';
+			let d1 = (day % 10) + b'0';
+			let path = &[
+				y0, y1, y2, y3, b'/', b'd', b'a', b'y', d0, d1, b'.', b'i', b'n', b'p', b'u', b't',
+			] as &[u8];
+			let path = unsafe { std::str::from_utf8_unchecked(path) };
+			let data = Inputs::get(&path).with_context(|| format!("missing {path}"))?;
 			for line in std::str::from_utf8(data.data.as_ref())?.lines() {
 				cb(line).with_context(|| format!("Failed parsing line: {line}"))?;
 			}
@@ -137,7 +150,7 @@ pub fn process_lines_of_file(
 		DataFrom::Stdin => {
 			let stdin = std::io::stdin();
 			let mut handle = stdin.lock();
-			let mut line = String::with_capacity(16);
+			let mut line = String::with_capacity(64);
 			while handle.read_line(&mut line)? > 0 {
 				cb(&line).with_context(|| format!("Failed parsing line: {line}"))?;
 				line.clear();
@@ -145,9 +158,65 @@ pub fn process_lines_of_file(
 		}
 		DataFrom::FilePath(filepath) => {
 			let mut data = BufReader::new(File::open(filepath)?);
-			let mut line = String::with_capacity(16);
+			let mut line = String::with_capacity(64);
 			while data.read_line(&mut line)? > 0 {
 				cb(&line).with_context(|| format!("Failed parsing line: {line}"))?;
+				line.clear();
+			}
+		}
+	}
+	Ok(())
+}
+
+pub fn process_lines_of_file_bytes(
+	data: &DataFrom,
+	mut cb: impl FnMut(&[u8]) -> anyhow::Result<()>,
+) -> anyhow::Result<()> {
+	match data {
+		DataFrom::Internal { year, day } => {
+			// let path = format!("{year}/day{day}.input");
+			let y0 = (year / 1000) as u8 + b'0';
+			let y1 = ((year / 100) % 10) as u8 + b'0';
+			let y2 = ((year / 10) % 10) as u8 + b'0';
+			let y3 = (year % 10) as u8 + b'0';
+			let d0 = (day / 10) + b'0';
+			let d1 = (day % 10) + b'0';
+			let path = &[
+				y0, y1, y2, y3, b'/', b'd', b'a', b'y', d0, d1, b'.', b'i', b'n', b'p', b'u', b't',
+			] as &[u8];
+			let path = unsafe { std::str::from_utf8_unchecked(path) };
+			let data = Inputs::get(&path).with_context(|| format!("missing `{path}`"))?;
+			for line in data.data.as_ref().split(|&b| b == b'\n') {
+				cb(line).with_context(|| {
+					format!("Failed parsing line: {:?}", std::str::from_utf8(line))
+				})?;
+			}
+		}
+		DataFrom::Static(data) => {
+			for line in data.as_bytes().split(|&b| b == b'\n') {
+				cb(line).with_context(|| {
+					format!("Failed parsing line: {:?}", std::str::from_utf8(line))
+				})?;
+			}
+		}
+		DataFrom::Stdin => {
+			let stdin = std::io::stdin();
+			let mut handle = stdin.lock();
+			let mut line = Vec::with_capacity(64);
+			while handle.read_until(b'\n', &mut line)? > 0 {
+				cb(&line).with_context(|| {
+					format!("Failed parsing line: {:?}", std::str::from_utf8(&line))
+				})?;
+				line.clear();
+			}
+		}
+		DataFrom::FilePath(filepath) => {
+			let mut data = std::io::BufReader::new(File::open(filepath)?);
+			let mut line = Vec::with_capacity(64);
+			while data.read_until(b'\n', &mut line)? > 0 {
+				cb(&line).with_context(|| {
+					format!("Failed parsing line: {:?}", std::str::from_utf8(&line))
+				})?;
 				line.clear();
 			}
 		}
@@ -165,11 +234,47 @@ pub fn process_trimmed_lines_of_file(
 	})
 }
 
+pub fn process_trimmed_lines_of_file_bytes(
+	data: &DataFrom,
+	mut cb: impl FnMut(&[u8]) -> anyhow::Result<()>,
+) -> anyhow::Result<()> {
+	process_lines_of_file_bytes(data, |mut line| {
+		while !line.is_empty() {
+			if line[0].is_ascii_whitespace() {
+				line = &line[1..];
+			} else {
+				break;
+			}
+		}
+		while !line.is_empty() {
+			if line[line.len() - 1].is_ascii_whitespace() {
+				line = &line[..line.len() - 1];
+			} else {
+				break;
+			}
+		}
+		cb(line)?;
+		Ok(())
+	})
+}
+
 pub fn process_trimmed_nonempty_lines_of_file(
 	data: &DataFrom,
 	mut cb: impl FnMut(&str) -> anyhow::Result<()>,
 ) -> anyhow::Result<()> {
 	process_trimmed_lines_of_file(data, |line| {
+		if !line.is_empty() {
+			cb(line)?;
+		}
+		Ok(())
+	})
+}
+
+pub fn process_trimmed_nonempty_lines_of_file_bytes(
+	data: &DataFrom,
+	mut cb: impl FnMut(&[u8]) -> anyhow::Result<()>,
+) -> anyhow::Result<()> {
+	process_trimmed_lines_of_file_bytes(data, |line| {
 		if !line.is_empty() {
 			cb(line)?;
 		}
@@ -211,6 +316,22 @@ pub fn fold_trimmed_nonempty_lines_of_file<R, F: FnMut(R, &str) -> anyhow::Resul
 ) -> anyhow::Result<R> {
 	let mut acc = Some(acc);
 	process_trimmed_nonempty_lines_of_file(data, |line| {
+		acc = Some(cb(
+			acc.take().context("failed to acquire accumulator value")?,
+			line,
+		)?);
+		Ok(())
+	})?;
+	acc.take().context("failed to return accumulator value")
+}
+
+pub fn fold_trimmed_nonempty_lines_of_file_bytes<R, F: FnMut(R, &[u8]) -> anyhow::Result<R>>(
+	data: &DataFrom,
+	acc: R,
+	mut cb: F,
+) -> anyhow::Result<R> {
+	let mut acc = Some(acc);
+	process_trimmed_nonempty_lines_of_file_bytes(data, |line| {
 		acc = Some(cb(
 			acc.take().context("failed to acquire accumulator value")?,
 			line,
