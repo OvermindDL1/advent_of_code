@@ -24,7 +24,7 @@ pub struct AocApp {
 	pub hide_scores: bool,
 	/// The command to execute
 	#[clap(subcommand)]
-	command: AocAppCommand,
+	pub command: AocAppCommand,
 }
 
 impl AocApp {
