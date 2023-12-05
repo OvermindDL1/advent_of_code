@@ -17,14 +17,6 @@ fn gen_input(year: u16, day: u8) -> DataFrom {
 	input
 }
 
-// #[library_benchmark]
-// #[bench::short(gen_input(2023, 1))]
-// fn y2023d01(input: DataFrom) -> (Day1, anyhow::Result<(i32, i32)>) {
-// 	let day = Day1 { input };
-// 	let res = day.run(&AOCAPP);
-// 	(day, res)
-// }
-
 macro_rules! bench_day {
 	($benchname:ident, $year:literal, $day:literal, $daystruct:tt) => {
 		#[library_benchmark]
