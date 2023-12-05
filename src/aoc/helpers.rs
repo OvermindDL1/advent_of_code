@@ -268,7 +268,7 @@ pub fn process_lines_of_file_bytes(
 				y0, y1, y2, y3, b'/', b'd', b'a', b'y', d0, d1, b'.', b'i', b'n', b'p', b'u', b't',
 			] as &[u8];
 			let path = unsafe { std::str::from_utf8_unchecked(path) };
-			let data = Inputs::get(&path).with_context(|| format!("missing `{path}`"))?;
+			let data = Inputs::get(path).with_context(|| format!("missing `{path}`"))?;
 			for line in data.data.as_ref().split(|&b| b == b'\n') {
 				cb(line).with_context(|| {
 					format!("Failed parsing line: {:?}", std::str::from_utf8(line))
