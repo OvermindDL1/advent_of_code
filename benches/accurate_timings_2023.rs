@@ -34,10 +34,11 @@ bench_day!(y2023d02, 2023, 2, Day2);
 bench_day!(y2023d03, 2023, 3, Day3);
 bench_day!(y2023d04, 2023, 4, Day4);
 bench_day!(y2023d05, 2023, 5, Day5);
+bench_day!(y2023d06, 2023, 6, Day6);
 
 library_benchmark_group!(
 	name = bench_year2023;
-	benchmarks = y2023d01, y2023d02, y2023d03, y2023d04, y2023d05
+	benchmarks = y2023d01, y2023d02, y2023d03, y2023d04, y2023d05, y2023d06
 );
 
 main!(library_benchmark_groups = bench_year2023);
