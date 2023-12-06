@@ -2,6 +2,7 @@ use crate::aoc::helpers::*;
 use crate::AocApp;
 use anyhow::{bail, Context as _};
 use clap::Parser;
+use std::num::ParseIntError;
 use std::ops::RangeInclusive;
 
 #[derive(Debug, Parser)]
@@ -34,16 +35,15 @@ impl Day6 {
 		let races = times_iter
 			.zip(distances_iter)
 			.map(|(time, record_distance)| {
-				Ok(Race {
+				Ok::<_, ParseIntError>(Race {
 					time: time?,
 					record_distance: record_distance?,
 				})
-			})
-			.collect::<anyhow::Result<Vec<_>>>()?;
+			});
 
 		let mut score1 = 1;
-		for race in &races {
-			let winning_range = race.get_winning_range()?;
+		for race in races {
+			let winning_range = race?.get_winning_range()?;
 			score1 *= winning_range.count() as u64;
 		}
 
