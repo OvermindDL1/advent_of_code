@@ -24,6 +24,7 @@ iai-callgrind = "0.8.0"
 image = "0.24"
 indexmap = "2.1"
 itertools = "0.12"
+mimalloc = { version = "*", default-features = false, optional = true }
 nalgebra = "0.32"
 nohash-hasher = "0.2.0"
 nom = "7.1.1"
@@ -38,6 +39,10 @@ termcolor = "1.4"
 thiserror = "1.0"
 tinyvec = { version = "1.6", features = ["alloc"] }
 tokio = { version = "1.34", features = ["full"] }
+
+[features]
+default = []
+mimalloc = ["dep:mimalloc", "mimalloc/override"]
 
 [profile.release]
 lto = true

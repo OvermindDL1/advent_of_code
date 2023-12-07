@@ -14,22 +14,21 @@ pub struct Day7 {
 impl Day7 {
 	pub fn run(&self, _app: &AocApp) -> anyhow::Result<(u64, u64)> {
 		let input = self.input.as_cow_str()?;
-		let mut hands: Vec<_> = input
-			.trim()
-			.split('\n')
-			.map(|line| {
-				if let Some((cards, bid)) = line.trim().split_once(' ') {
-					let mut card_types = [CardValue::Two; 5];
-					for (idx, card) in cards.as_bytes()[..5].iter().copied().enumerate() {
-						card_types[idx] = card.try_into()?;
-					}
-					let bid = bid.parse::<u64>()?;
-					Ok(Hand::new(card_types, bid))
-				} else {
-					bail!("Invalid line: {}", line)
+		let mut hands = Vec::with_capacity(512);
+		for hand in input.trim().split('\n').map(|line| {
+			if let Some((cards, bid)) = line.trim().split_once(' ') {
+				let mut card_types = [CardValue::Two; 5];
+				for (idx, card) in cards.as_bytes()[..5].iter().copied().enumerate() {
+					card_types[idx] = card.try_into()?;
 				}
-			})
-			.collect::<anyhow::Result<_>>()?;
+				let bid = bid.parse::<u64>()?;
+				Ok(Hand::new(card_types, bid))
+			} else {
+				bail!("Invalid line: {}", line)
+			}
+		}) {
+			hands.push(hand?);
+		}
 
 		hands.sort_by(Hand::cmp_rank);
 
