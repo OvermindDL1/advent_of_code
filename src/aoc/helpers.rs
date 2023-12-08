@@ -25,6 +25,15 @@ impl Clone for DataFrom {
 	}
 }
 
+impl From<&'static str> for DataFrom {
+	fn from(value: &'static str) -> Self {
+		DataFrom {
+			data: DataFromState::Static(Cow::Borrowed(value)),
+			cache: ArcSwapOption::default(),
+		}
+	}
+}
+
 #[derive(Clone, Debug)]
 pub enum DataFromState {
 	Internal { year: u16, day: u8 },
@@ -449,4 +458,63 @@ pub fn fold_trimmed_nonempty_lines_of_file_bytes<R, F: FnMut(R, &[u8]) -> anyhow
 		Ok(())
 	})?;
 	acc.take().context("failed to return accumulator value")
+}
+
+#[cfg(test)]
+pub fn gen_internal_input(year: u16, day: u8) -> DataFrom {
+	let input = DataFrom::internal(year, day);
+	input
+		.preload()
+		.expect("preload from internal should never fail");
+	input
+}
+
+#[cfg(test)]
+pub const EMPTY_TUI_AOC_APP: crate::AocApp = crate::AocApp {
+	verbose: 0,
+	hide_scores: true,
+	command: crate::AocAppCommand::TUI,
+};
+
+#[cfg(test)]
+#[macro_export]
+macro_rules! run_basic_tests {
+	(super::$day:tt, $($data_name:ident : $test_data:expr,)*) => {
+		use super::$day as Day;
+		$crate::run_basic_tests!(Day, $($data_name : $test_data,)*);
+	};
+	($Day:tt, $($data_name:ident : $test_data:expr,)*) => {
+		$(
+			#[test] fn $data_name() {
+				let (input, expected) = $test_data;
+				let day = $Day {
+					input: $crate::aoc::helpers::DataFrom::from(input),
+				};
+				if let Ok(result) = day.run(&$crate::aoc::helpers::EMPTY_TUI_AOC_APP) {
+					assert_eq!(result, expected);
+				} else {
+					panic!("Test failed for input:\n{input}");
+				}
+			}
+		)*
+	};
+	(super::$day:tt, $test_data:expr) => {
+		use super::$day as Day;
+		$crate::run_basic_tests!(Day, $test_data);
+	};
+	($Day:tt, $test_data:expr) => {
+		#[test]
+		fn example_data() {
+			for (input, expected) in $test_data {
+				let day = $Day {
+					input: $crate::aoc::helpers::DataFrom::from(input),
+				};
+				if let Ok(result) = day.run(&$crate::aoc::helpers::EMPTY_TUI_AOC_APP) {
+					assert_eq!(result, expected);
+				} else {
+					panic!("Test failed for input:\n{input}");
+				}
+			}
+		}
+	};
 }
