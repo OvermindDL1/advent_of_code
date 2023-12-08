@@ -1,8 +1,8 @@
 use crate::aoc::helpers::*;
 use crate::AocApp;
-use ahash::{HashMap, HashMapExt};
 use anyhow::{bail, Context};
 use clap::Parser;
+use indexmap::IndexMap;
 use itertools::Itertools;
 use num::integer::Integer;
 
@@ -22,7 +22,7 @@ impl Day8 {
 			.with_context(|| "Failed to split input into directions and map from:\n{input}")?;
 		let directions = directions.trim().as_bytes();
 
-		let mut map = HashMap::with_capacity(1024);
+		let mut map = IndexMap::with_capacity(1024);
 		for line in map_lines.trim().lines() {
 			let line = line.trim();
 			match *line.as_bytes() {
@@ -32,18 +32,38 @@ impl Day8 {
 				ref invalid => bail!("invalid map line: {invalid:?}"),
 			}
 		}
+		let map: IndexMap<_, _> = map
+			.iter()
+			.map(|(k, (l, r))| {
+				Ok((
+					k.to_owned(),
+					(
+						map.get_index_of(l).with_context(|| {
+							format!("missing left key of {:?}", std::str::from_utf8(l))
+						})?,
+						map.get_index_of(r).with_context(|| {
+							format!("missing right key of {:?}", std::str::from_utf8(l))
+						})?,
+					),
+				))
+			})
+			.collect::<anyhow::Result<_>>()?;
 
 		let mut score1 = 0;
-		let mut current = *b"AAA";
-		let destination = *b"ZZZ";
+		// let mut current = *b"AAA";
+		let mut current = map.get_index_of(b"AAA").context("invalid map key: AAA")?;
+		let destination = map.get_index_of(b"ZZZ").context("invalid map key: AAA")?;
 		for dir in directions.iter().copied().cycle() {
 			score1 += 1;
-			let entry = map
-				.get(&current)
-				.with_context(|| format!("invalid map key: {:?}", std::str::from_utf8(&current)))?;
+			let entry = map.get_index(current).with_context(|| {
+				format!(
+					"invalid map key: {:?}",
+					map.get_index(current).map(|k| std::str::from_utf8(k.0))
+				)
+			})?;
 			current = match dir {
-				b'L' => entry.0,
-				b'R' => entry.1,
+				b'L' => entry.1 .0,
+				b'R' => entry.1 .1,
 				_ => bail!("invalid direction: {dir}"),
 			};
 			if current == destination {
@@ -51,7 +71,12 @@ impl Day8 {
 			}
 		}
 
-		let mut currents: Vec<_> = map.keys().filter(|k| k[2] == b'A').copied().collect();
+		let mut currents: Vec<_> = map
+			.keys()
+			.enumerate()
+			.filter(|(_idx, k)| k[2] == b'A')
+			.map(|(idx, _k)| idx)
+			.collect();
 		let mut cycles = Vec::with_capacity(currents.len());
 		let mut counts = Vec::with_capacity(2);
 		for current in &mut currents {
@@ -61,15 +86,18 @@ impl Day8 {
 			while first_match != Some(*current) || counts.len() <= 1 {
 				for dir in &mut dir_iter {
 					count += 1;
-					let entry = map.get(current).with_context(|| {
-						format!("invalid map key: {:?}", std::str::from_utf8(current))
+					let (_, entry) = map.get_index(*current).with_context(|| {
+						format!(
+							"invalid map key: {:?}",
+							map.get_index(*current).map(|k| std::str::from_utf8(k.0))
+						)
 					})?;
 					*current = match dir {
 						b'L' => entry.0,
 						b'R' => entry.1,
 						_ => bail!("invalid direction: {dir}"),
 					};
-					if current[2] == b'Z' {
+					if map.get_index(*current).context("missing known key")?.0[2] == b'Z' {
 						if first_match.is_none() {
 							first_match = Some(*current);
 						}
