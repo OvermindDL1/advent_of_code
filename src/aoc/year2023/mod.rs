@@ -6,6 +6,7 @@ pub mod day5;
 pub mod day6;
 pub mod day7;
 pub mod day8;
+pub mod day9;
 
 pub use day1::Day1;
 pub use day2::Day2;
@@ -15,6 +16,7 @@ pub use day5::Day5;
 pub use day6::Day6;
 pub use day7::Day7;
 pub use day8::Day8;
+pub use day9::Day9;
 
 use crate::AocApp;
 use clap::Parser;
@@ -47,6 +49,9 @@ pub enum Year2023 {
 	/// Advent of Code 2023, Day 8: Haunted Wasteland
 	#[clap(name = "8")]
 	Day8(Day8),
+	/// Advent of Code 2023, Day 9: Mirage Maintenance
+	#[clap(name = "9")]
+	Day9(Day9),
 }
 
 impl Year2023 {
@@ -55,7 +60,7 @@ impl Year2023 {
 			Year2023,
 			self,
 			app,
-			[Day1, Day2, Day3, Day4, Day5, Day6, Day7, Day8]
+			[Day1, Day2, Day3, Day4, Day5, Day6, Day7, Day8, Day9]
 		)
 	}
 
@@ -63,7 +68,7 @@ impl Year2023 {
 		crate::run_all_days!(
 			Year2023,
 			app,
-			[Day1, Day2, Day3, Day4, Day5, Day6, Day7, Day8]
+			[Day1, Day2, Day3, Day4, Day5, Day6, Day7, Day8, Day9]
 		)
 	}
 }

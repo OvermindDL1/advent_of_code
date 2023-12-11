@@ -490,10 +490,9 @@ macro_rules! run_basic_tests {
 				let day = $Day {
 					input: $crate::aoc::helpers::DataFrom::from(input),
 				};
-				if let Ok(result) = day.run(&$crate::aoc::helpers::EMPTY_TUI_AOC_APP) {
-					assert_eq!(result, expected);
-				} else {
-					panic!("Test failed for input:\n{input}");
+				match day.run(&$crate::aoc::helpers::EMPTY_TUI_AOC_APP) {
+					Ok(result) => assert_eq!(result, expected),
+					Err(err) => panic!("Test failed for input:\n{input}\n{err:?}"),
 				}
 			}
 		)*
@@ -509,10 +508,9 @@ macro_rules! run_basic_tests {
 				let day = $Day {
 					input: $crate::aoc::helpers::DataFrom::from(input),
 				};
-				if let Ok(result) = day.run(&$crate::aoc::helpers::EMPTY_TUI_AOC_APP) {
-					assert_eq!(result, expected);
-				} else {
-					panic!("Test failed for input:\n{input}");
+				match day.run(&$crate::aoc::helpers::EMPTY_TUI_AOC_APP) {
+					Ok(result) => assert_eq!(result, expected),
+					Err(err) => panic!("Test failed for input:\n{input}\n{err:?}"),
 				}
 			}
 		}

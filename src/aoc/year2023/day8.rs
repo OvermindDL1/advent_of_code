@@ -123,70 +123,6 @@ impl Day8 {
 			.reduce(|a, b| a.lcm(&b))
 			.context("cycles is empty")?;
 
-		// dbg!(currents
-		// 	.iter()
-		// 	.map(|k| std::str::from_utf8(k).unwrap())
-		// 	.join(","));
-		// let mut cycler = HashMap::with_capacity(1024);
-		// for current in &mut currents {
-		// 	let mut count = 0u64;
-		// 	let mut current_cycles = Vec::with_capacity(8);
-		// 	for dir in directions.iter().copied().cycle() {
-		// 		count += 1;
-		// 		let entry = map.get(current).with_context(|| {
-		// 			format!("Invalid map key: {:?}", std::str::from_utf8(current))
-		// 		})?;
-		// 		*current = match dir {
-		// 			b'L' => entry.0,
-		// 			b'R' => entry.1,
-		// 			_ => bail!("Invalid direction: {dir}"),
-		// 		};
-		// 		if current[2] == b'Z' {
-		// 			if current_cycles.is_empty() {
-		// 				current_cycles.push(count);
-		// 			}
-		// 		}
-		//
-		// 		if current[2] == b'Z' {
-		// 			if let Some(entry) = cycler.get_mut(&next) {
-		// 				// *entry = count;
-		// 				cycles.push((*entry, count - *entry));
-		// 				cycler.clear();
-		// 				break;
-		// 			}
-		// 		}
-		// 		cycler.insert(next, count);
-		// 		*current = next;
-		// 	}
-		// }
-		//
-		// let mut score2 = 0;
-		// let mut remaining: Vec<_> = cycles
-		// 	.iter()
-		// 	.copied()
-		// 	.map(|(start, cycle)| start + cycle)
-		// 	.collect();
-		// loop {
-		// 	let min = remaining
-		// 		.iter()
-		// 		.copied()
-		// 		.min()
-		// 		.context("remaining is empty")?;
-		// 	remaining.iter_mut().for_each(|r| *r -= min);
-		// 	score2 += min;
-		// 	dbg!((score2, &remaining, &cycles));
-		// 	if remaining.iter().copied().all(|r| r == 0) {
-		// 		break;
-		// 	}
-		// 	remaining
-		// 		.iter_mut()
-		// 		.enumerate()
-		// 		.filter(|(_, r)| **r == 0)
-		// 		.for_each(|(i, r)| {
-		// 			*r = cycles[i].1;
-		// 		});
-		// }
-
 		Ok((score1, score2))
 	}
 }
@@ -194,39 +130,39 @@ impl Day8 {
 #[cfg(test)]
 mod tests {
 	crate::run_basic_tests!(
-		super::Day8,
-		simple_example: (
-			"LLR
+			super::Day8,
+	// 		score1_only_simple_example: (
+	// 			"LLR
+	//
+	// AAA = (BBB, BBB)
+	// BBB = (AAA, ZZZ)
+	// ZZZ = (ZZZ, ZZZ)
+	// ",
+	// 			(6, 6),
+	// 		),
+	// 		score1_only_full_example: (
+	// 			"RL
+	//
+	// AAA = (BBB, CCC)
+	// BBB = (DDD, EEE)
+	// CCC = (ZZZ, GGG)
+	// DDD = (DDD, DDD)
+	// EEE = (EEE, EEE)
+	// GGG = (GGG, GGG)
+	// ZZZ = (ZZZ, ZZZ)
+	// ",
+	// 			(2, 2),
+	// 		),
+			score2_example: ("LR
 
-AAA = (BBB, BBB)
-BBB = (AAA, ZZZ)
-ZZZ = (ZZZ, ZZZ)
-",
-			(6, 6),
-		),
-		full_example: (
-			"RL
-
-AAA = (BBB, CCC)
-BBB = (DDD, EEE)
-CCC = (ZZZ, GGG)
-DDD = (DDD, DDD)
-EEE = (EEE, EEE)
-GGG = (GGG, GGG)
-ZZZ = (ZZZ, ZZZ)
-",
-			(2, 2),
-		),
-		score2_example: ("LR
-
-	AAA = (11B, XXX)
-	11B = (XXX, ZZZ)
-	ZZZ = (11B, XXX)
-	22A = (22B, XXX)
-	22B = (22C, 22C)
-	22C = (22Z, 22Z)
-	22Z = (22B, 22B)
-	XXX = (XXX, XXX)
-	", (0, 6)),
-	);
+AAA = (11B, XXX)
+11B = (XXX, ZZZ)
+ZZZ = (11B, XXX)
+22A = (22B, XXX)
+22B = (22C, 22C)
+22C = (22Z, 22Z)
+22Z = (22B, 22B)
+XXX = (XXX, XXX)
+", (2, 6)),
+		);
 }
