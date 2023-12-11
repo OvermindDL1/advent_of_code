@@ -5,6 +5,7 @@ use std::borrow::Cow;
 use std::ffi::OsStr;
 use std::fmt::{Display, Formatter};
 use std::fs::File;
+use std::hash::{BuildHasher, Hasher};
 use std::io::BufRead;
 use std::path::PathBuf;
 use std::str::FromStr;
@@ -516,3 +517,47 @@ macro_rules! run_basic_tests {
 		}
 	};
 }
+
+#[derive(Default)]
+pub struct IdentityHasher(u64);
+
+impl BuildHasher for IdentityHasher {
+	type Hasher = IdentityHasher;
+
+	fn build_hasher(&self) -> Self::Hasher {
+		IdentityHasher(0)
+	}
+}
+
+impl Hasher for IdentityHasher {
+	fn finish(&self) -> u64 {
+		self.0
+	}
+
+	fn write(&mut self, _bytes: &[u8]) {
+		todo!()
+	}
+
+	fn write_u8(&mut self, i: u8) {
+		self.0 = i as u64;
+	}
+
+	fn write_u16(&mut self, i: u16) {
+		self.0 = i as u64;
+	}
+
+	fn write_u32(&mut self, i: u32) {
+		self.0 = i as u64;
+	}
+
+	fn write_u64(&mut self, i: u64) {
+		self.0 = i;
+	}
+
+	fn write_usize(&mut self, i: usize) {
+		self.0 = i as u64;
+	}
+}
+
+pub type IdentityHashSet<T> = std::collections::HashSet<T, IdentityHasher>;
+pub type IdentityHashMap<T, V> = std::collections::HashMap<T, V, IdentityHasher>;
