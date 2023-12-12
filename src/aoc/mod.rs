@@ -63,7 +63,7 @@ pub enum AocYear {
 		#[clap(subcommand)]
 		day: year2022::Year2022,
 	},
-	/// Advent of Code 2022
+	/// Advent of Code 2023
 	#[clap(name = "2023")]
 	Year2023 {
 		#[clap(subcommand)]
