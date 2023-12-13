@@ -10,7 +10,7 @@ pub struct Day13 {
 }
 
 impl Day13 {
-	pub fn run(&self, _app: &AocApp) -> anyhow::Result<(u64, u64)> {
+	pub fn run(&self, _app: &AocApp) -> anyhow::Result<(i64, i64)> {
 		Ok((-1, -1))
 	}
 }
